@@ -1,8 +1,8 @@
-from knn import KNN
-from dmc import DMC
+from assignment1.knn import KNN
+from assignment1.dmc import DMC
 from helpers.csv_helper import train_test_split
 from helpers.plot_helper import plot_decision_surface
-from dataset import Dataset
+from assignment1.dataset import Dataset
 
 # TODO: Requirements
 
@@ -49,20 +49,20 @@ iris_encodings = [
     {'Iris-virginica': 0},   # Binary: 0 - Versicolor, 1 - Others
     {'Iris-setosa': 0, 'Iris-versicolor': 1, 'Iris-virginica': 2}  # Multiclass
 ]
-dataset = Dataset('datasets/iris.csv', encoding=iris_encodings[0])
+dataset = Dataset('assignment1/datasets/iris.csv', encoding=iris_encodings[0])
 
 # Artificial dataset
-# dataset = Dataset('datasets/artificial.csv')
+# dataset = Dataset('assignment1/datasets/artificial.csv')
 
 # Params
 train_test_ratio = 0.8
 evaluation_rounds = 10
 
 # KNN
-# model = KNN(5)
+model = KNN(5)
 
 # DMC
-model = DMC()
+# model = DMC()
 
 # Calculate average accuracy for the model
 evaluate(model, dataset, ratio=train_test_ratio, rounds=evaluation_rounds)
