@@ -1,10 +1,20 @@
 from assignment1.knn import KNN
 from assignment1.dmc import DMC
 from helpers.csv_helper import train_test_split
-from helpers.plot_helper import plot_decision_surface
 from assignment1.dataset import Dataset
 
-# TODO: Requirements
+# Import plotting modules, if they're available
+try:
+    from helpers.plot_helper import plot_decision_surface
+    plotting_available = True
+except ModuleNotFoundError:
+    plotting_available = False
+
+# Requirements
+# Minimum: Python 3.9.2
+# Optional (only required for plotting graphs):
+#   numpy 1.20.2
+#   matplotlib 3.3.4
 
 
 def evaluate(model, dataset, ratio=0.8, rounds=1):
@@ -68,4 +78,5 @@ model = KNN(5)
 evaluate(model, dataset, ratio=train_test_ratio, rounds=evaluation_rounds)
 
 # Plot decision surface
-plot_evaluate(model, dataset, ratio=train_test_ratio)
+if plotting_available:
+    plot_evaluate(model, dataset, ratio=train_test_ratio)
