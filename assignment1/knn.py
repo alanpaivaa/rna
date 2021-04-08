@@ -2,13 +2,12 @@ import math
 
 
 class KNN:
-    def __init__(self):
+    def __init__(self, k):
         self.training_set = None
-        self.k = 1
-
-    def train(self, training_set, k):
-        self.training_set = training_set
         self.k = k
+
+    def train(self, training_set):
+        self.training_set = training_set
 
     def euclidean_distance(self, x, y):
         summation = 0

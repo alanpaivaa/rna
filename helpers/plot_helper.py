@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_decision_surface(model, test_set, offset=0.0, title=None, xlabel=None, ylabel=None, legend=None, filename=None):
+def plot_decision_surface(model, test_set, extra_set=list(), offset=0.0, title=None, xlabel=None, ylabel=None, legend=None, filename=None):
     # Set figure size
     px = 1 / plt.rcParams['figure.dpi']  # pixel in inches
     plt.subplots(figsize=(600 * px, 360 * px))
@@ -51,7 +51,7 @@ def plot_decision_surface(model, test_set, offset=0.0, title=None, xlabel=None, 
         vmax=vmax,
         alpha=0.25,
         colors=colors
-    );
+    )
 
     # Plot scattered points
     for i in classes:
@@ -62,6 +62,18 @@ def plot_decision_surface(model, test_set, offset=0.0, title=None, xlabel=None, 
         else:
             label = None
         plt.scatter(xi[:, 0], xi[:, 1], c=colors[i], s=10, label=label)
+
+    # Plot extra points
+    np_extra_set = np.array(extra_set)
+    if len(extra_set) > 0:
+        for i in classes:
+            idx = np_extra_set[:, -1] == i
+            xi = np_extra_set[idx]
+            if legend is not None:
+                label = legend[i]
+            else:
+                label = None
+            plt.scatter(xi[:, 0], xi[:, 1], c=colors[i], s=100, marker=',', label=label)
 
     if title is not None:
         plt.title(title)
