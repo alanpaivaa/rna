@@ -1,21 +1,10 @@
 from knn import KNN
 from dmc import DMC
-from helpers.csv_helper import load_dataset, train_test_split
+from helpers.csv_helper import train_test_split
 from helpers.plot_helper import plot_decision_surface
+from dataset import Dataset
 
 # TODO: Requirements
-
-
-def encoded_classes(dataset, encoding):
-    # For values not contained in the encoding dict, we use the value max + 1
-    unknown = max(encoding.values()) + 1
-    for row in dataset:
-        klass = row[-1]  # Last element of the array is the class
-        if encoding.get(klass) is not None:
-            row[-1] = encoding[row[-1]]
-        else:
-            row[-1] = unknown
-    return dataset
 
 
 def evaluate(model, dataset, ratio=0.8, rounds=1):
@@ -25,7 +14,7 @@ def evaluate(model, dataset, ratio=0.8, rounds=1):
         correct_predictions = 0
 
         # Train the model
-        training_set, test_set = train_test_split(dataset, ratio, shuffle=True)
+        training_set, test_set = train_test_split(dataset.load(), ratio, shuffle=True)
         model.train(training_set)
 
         # Test the model
@@ -41,7 +30,7 @@ def evaluate(model, dataset, ratio=0.8, rounds=1):
 
 
 def plot_evaluate(model, dataset, ratio=0.8):
-    training_set, test_set = train_test_split(dataset, ratio, shuffle=True)
+    training_set, test_set = train_test_split(dataset.load(), ratio, shuffle=True)
     model.train(training_set)
 
     if type(model) == DMC:
@@ -53,13 +42,17 @@ def plot_evaluate(model, dataset, ratio=0.8):
     print('Done!')
 
 
-# Load dataset
-filename = 'iris.csv'
-dataset = load_dataset(filename)
+# Iris dataset
+iris_encodings = [
+    {'Iris-setosa': 0},      # Binary: 0 - Setosa, 1 - Others
+    {'Iris-versicolor': 0},  # Binary: 0 - Virginica, 1 - Others
+    {'Iris-virginica': 0},   # Binary: 0 - Versicolor, 1 - Others
+    {'Iris-setosa': 0, 'Iris-versicolor': 1, 'Iris-virginica': 2}  # Multiclass
+]
+dataset = Dataset('datasets/iris.csv', encoding=iris_encodings[0])
 
-# Encode class value from string to integer
-encoding = {'Iris-virginica': 0, 'Iris-setosa': 1, 'Iris-versicolor': 2}
-dataset = encoded_classes(dataset, encoding)
+# Artificial dataset
+# dataset = Dataset('datasets/artificial.csv')
 
 # Params
 train_test_ratio = 0.8
