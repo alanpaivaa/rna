@@ -5,7 +5,7 @@ import numpy as np
 def plot_decision_surface(model, test_set, extra_set=list(), offset=0.0, title=None, xlabel=None, ylabel=None, legend=None, filename=None):
     # Set figure size
     px = 1 / plt.rcParams['figure.dpi']  # pixel in inches
-    plt.subplots(figsize=(600 * px, 360 * px))
+    plt.subplots(figsize=(600 * px, 400 * px))
 
     # Get x and y out of test set
     np_test_set = np.array(test_set)
@@ -30,7 +30,7 @@ def plot_decision_surface(model, test_set, extra_set=list(), offset=0.0, title=N
     points = np.array([grid_x1.ravel(), grid_x2.ravel()]).T
     predicted = list()
     for row in points:
-        predicted.append(model.predict(row))
+        predicted.append(model.predict(list(row)))
     predicted = np.array(predicted)
 
     # Get class information

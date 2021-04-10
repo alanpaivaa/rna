@@ -30,17 +30,23 @@ def evaluate(model, dataset, ratio=0.8, rounds=1):
         # Test the model
         for row in test_set:
             klass = row[-1]
-            predicted = model.predict(row)
+            predicted = model.predict(row[:-1])
             if predicted == klass:
                 correct_predictions += 1
         total_accuracy += correct_predictions / len(test_set)
 
     average_accuracy = total_accuracy / rounds
-    print("Accuracy: {:.2f}".format(average_accuracy))
+    print("Accuracy: {:.2f}%".format(average_accuracy * 100))
 
 
-def plot_evaluate(model, dataset, ratio=0.8):
-    training_set, test_set = train_test_split(dataset.load(), ratio, shuffle=True)
+def plot_evaluate(model, dataset, ratio=0.8, cols=(0, 1)):
+    data = dataset.load()
+
+    # We can only plot 2D
+    for i in range(len(data)):
+        data[i] = [data[i][cols[0]], data[i][cols[1]], data[i][-1]]
+
+    training_set, test_set = train_test_split(data, ratio, shuffle=True)
     model.train(training_set)
 
     if type(model) == DMC:
@@ -48,7 +54,14 @@ def plot_evaluate(model, dataset, ratio=0.8):
     else:
         extra_set = list()
 
-    plot_decision_surface(model, test_set, extra_set=extra_set, offset=0.2)
+    # features = ["Sepal length (cm)", "Sepal width (cm)", "Petal length (cm)", "Petal width (cm)"]
+
+    # legend = {0: 'Setosa', 1: 'Versicolor', 2: 'Virginica'}
+    # legend = {0: 'Setosa', 1: 'Other'}
+    # legend = {0: 'Versicolor', 1: 'Other'}
+    # legend = {0: 'Virginica', 1: 'Other'}
+    legend = None
+    plot_decision_surface(model, test_set, extra_set=extra_set, offset=0.2, legend=legend)
     print('Done!')
 
 
@@ -59,7 +72,7 @@ iris_encodings = [
     {'Iris-virginica': 0},   # Binary: 0 - Versicolor, 1 - Others
     {'Iris-setosa': 0, 'Iris-versicolor': 1, 'Iris-virginica': 2}  # Multiclass
 ]
-dataset = Dataset('assignment1/datasets/iris.csv', encoding=iris_encodings[0])
+dataset = Dataset('assignment1/datasets/iris.csv', encoding=iris_encodings[3])
 
 # Artificial dataset
 # dataset = Dataset('assignment1/datasets/artificial.csv')
@@ -69,7 +82,7 @@ train_test_ratio = 0.8
 evaluation_rounds = 10
 
 # KNN
-model = KNN(5)
+model = KNN(7)
 
 # DMC
 # model = DMC()

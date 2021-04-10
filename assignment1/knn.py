@@ -19,7 +19,7 @@ class KNN:
     def get_neighbors(self, point):
         distances = []
         for i in range(len(self.training_set)):
-            distance = self.euclidean_distance(point, self.training_set[i][:-1])
+            distance = self.euclidean_distance(self.training_set[i][:-1], point)
             distances.append((i, distance))
         distances.sort(key=lambda x: x[1])
         indexes = list(map(lambda x: x[0], distances[:self.k]))
@@ -36,6 +36,8 @@ class KNN:
         return max(count, key=lambda key: count[key])
 
     def predict(self, point):
+        # Point in test SHOULD NOT include the class value
+        assert(len(self.training_set[0]) - 1 == len(point))
         neighbors = self.get_neighbors(point)
         prediction = self.max_class(neighbors)
         return prediction
