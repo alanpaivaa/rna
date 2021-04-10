@@ -54,14 +54,18 @@ def plot_evaluate(model, dataset, ratio=0.8, cols=(0, 1)):
     else:
         extra_set = list()
 
-    # features = ["Sepal length (cm)", "Sepal width (cm)", "Petal length (cm)", "Petal width (cm)"]
+    features = ["Tamanho da sépala (cm)", "Largura da sépala (cm)", "Tamanho da pétala (cm)", "Largura da pétala (cm)"]
+    # features = ["X", "Y"]
 
     # legend = {0: 'Setosa', 1: 'Versicolor', 2: 'Virginica'}
-    # legend = {0: 'Setosa', 1: 'Other'}
-    # legend = {0: 'Versicolor', 1: 'Other'}
-    # legend = {0: 'Virginica', 1: 'Other'}
+    # legend = {0: 'Setosa', 1: 'Outras'}
+    # legend = {0: 'Versicolor', 1: 'Outras'}
+    # legend = {0: 'Virginica', 1: 'Outras'}
     legend = None
-    plot_decision_surface(model, test_set, extra_set=extra_set, offset=0.2, legend=legend)
+    # legend = {0: '0', 1: '1'}
+    plot_decision_surface(model, test_set, extra_set=extra_set, offset=0.2, legend=legend,
+                          title="Base de dados Artificial", xlabel=features[cols[0]], ylabel=features[cols[1]])
+                          # filename="knn_{}_{}.jpg".format(cols[0], cols[1]))
     print('Done!')
 
 
@@ -92,4 +96,4 @@ evaluate(model, dataset, ratio=train_test_ratio, rounds=evaluation_rounds)
 
 # Plot decision surface
 if plotting_available:
-    plot_evaluate(model, dataset, ratio=train_test_ratio)
+    plot_evaluate(model, dataset, ratio=train_test_ratio, cols=(0, 1))

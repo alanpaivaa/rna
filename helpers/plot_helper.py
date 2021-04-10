@@ -73,7 +73,7 @@ def plot_decision_surface(model, test_set, extra_set=list(), offset=0.0, title=N
                 label = legend[i]
             else:
                 label = None
-            plt.scatter(xi[:, 0], xi[:, 1], c=colors[i], s=100, marker=',', label=label)
+            plt.scatter(xi[:, 0], xi[:, 1], c=colors[i], s=100, marker=',')
 
     if title is not None:
         plt.title(title)
