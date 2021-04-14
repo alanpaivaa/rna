@@ -1,7 +1,7 @@
 from assignment1.knn import KNN
 from assignment1.dmc import DMC
 from helpers.csv_helper import train_test_split
-from assignment1.dataset import Dataset
+from helpers.dataset import Dataset
 
 # Import plotting modules, if they're available
 try:
