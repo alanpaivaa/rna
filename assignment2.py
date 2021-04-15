@@ -9,7 +9,7 @@ from helpers.scores import Scores
 def evaluate(model, dataset, ratio=0.8, realizations=20):
     accuracies = list()
 
-    max_accuracy = 0
+    max_scores = None
     losses = None
 
     for i in range(0, realizations):
@@ -19,6 +19,7 @@ def evaluate(model, dataset, ratio=0.8, realizations=20):
 
         y = list()
         predictions = list()
+        scores = None
 
         # Test the model
         for row in test_set:
@@ -28,11 +29,14 @@ def evaluate(model, dataset, ratio=0.8, realizations=20):
         scores = Scores(y, predictions)
         accuracies.append(scores.accuracy)
 
-        scores.print_confusion_matrix()
-
-        if scores.accuracy > max_accuracy:
-            max_accuracy = scores.accuracy
+        if max_scores is None or scores.accuracy > max_scores.accuracy:
+            max_scores = scores
             losses = model.losses
+
+    print("Best confusion matrix")
+    max_scores.print_confusion_matrix()
+
+    # print("Best accuracy: {:.2f}%".format(max_scores.accuracy * 100))
 
     mean_accuracy = math_helper.mean(accuracies)
     std_accuracy = math_helper.standard_deviation(accuracies)
