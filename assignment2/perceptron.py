@@ -1,26 +1,5 @@
 import random
-
-# TODO: Move somewhere else
-def matrix_product(a, b):
-    acc = 0
-    for (i, j) in zip(a, b):
-        acc += (i*j)
-    return acc
-
-
-def step(u):
-    if u >= 0:
-        return 1
-    else:
-        return 0
-
-
-def vector_scalar_product(vector, number):
-    return [number * v for v in vector]
-
-
-def vector_sum(a, b):
-    return [i+j for (i, j) in zip(a, b)]
+import helpers.math as math_helper
 
 
 class Perceptron:
@@ -45,15 +24,15 @@ class Perceptron:
         self.weights = [0 for _ in range(num_weights)]
 
     def optimize_weights(self, row, loss):
-        self.weights = vector_sum(
+        self.weights = math_helper.vector_sum(
             self.weights,
-            vector_scalar_product(self.biased_row(row), loss * self.learning_rate)
+            math_helper.vector_scalar_product(self.biased_row(row), loss * self.learning_rate)
         )
 
     def predict(self, row):
         # Calculate activation function and output
-        u = matrix_product(self.biased_row(row), self.weights)
-        return step(u)
+        u = math_helper.matrix_product(self.biased_row(row), self.weights)
+        return math_helper.step(u)
 
     def train(self, training_set):
         # Initialize weights
@@ -81,5 +60,3 @@ class Perceptron:
             if loss_sum == 0:
                 print("Early stopping training in epoch {} as no mistakes were made".format(epoch))
                 break
-
-
