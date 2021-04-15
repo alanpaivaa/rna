@@ -10,7 +10,7 @@ def evaluate(model, dataset, ratio=0.8, realizations=20):
     accuracies = list()
 
     max_scores = None
-    losses = None
+    errors = None
 
     for i in range(0, realizations):
         # Train the model
@@ -31,7 +31,7 @@ def evaluate(model, dataset, ratio=0.8, realizations=20):
 
         if max_scores is None or scores.accuracy > max_scores.accuracy:
             max_scores = scores
-            losses = model.losses
+            errors = model.errors
 
     print("Best confusion matrix")
     max_scores.print_confusion_matrix()
@@ -43,24 +43,29 @@ def evaluate(model, dataset, ratio=0.8, realizations=20):
     print("Mean accuracy: {:.2f}%".format(mean_accuracy * 100))
     print("Accuracy standard deviation: {:.2f}%".format(std_accuracy * 100))
 
-    plt.plot(losses)
-    plt.title("Soma dos erros por época pra realização com maior taxa de acerto")
+    plt.plot(errors)
+    plt.title("Soma dos erros por época")
     plt.xlabel("Épocas")
     plt.ylabel("Soma dos erros")
     plt.show()
 
 
-# Iris dataset
+# # Iris dataset
+# iris_encodings = [
+#     {'Iris-setosa': 0},      # Binary: 0 - Setosa, 1 - Others
+#     {'Iris-versicolor': 0},  # Binary: 0 - Virginica, 1 - Others
+#     {'Iris-virginica': 0},   # Binary: 0 - Versicolor, 1 - Others
+#     {'Iris-setosa': 0, 'Iris-versicolor': 1, 'Iris-virginica': 2}  # Multiclass (doesn't make sense for perceptron)
+# ]
+# dataset = Dataset('assignment2/datasets/iris.csv', encoding=iris_encodings[1])
+
 iris_encodings = [
-    {'Iris-setosa': 0},      # Binary: 0 - Setosa, 1 - Others
-    {'Iris-versicolor': 0},  # Binary: 0 - Virginica, 1 - Others
-    {'Iris-virginica': 0},   # Binary: 0 - Versicolor, 1 - Others
-    {'Iris-setosa': 0, 'Iris-versicolor': 1, 'Iris-virginica': 2}  # Multiclass (doesn't make sense for perceptron)
+    {'R': 0, 'M': 1}
 ]
-dataset = Dataset('assignment2/datasets/iris.csv', encoding=iris_encodings[1])
+dataset = Dataset('assignment2/datasets/sonar.csv', encoding=iris_encodings[0])
 
 ratio = 0.8
 
-model = Perceptron(epochs=50, early_stopping=False, verbose=False)
+model = Perceptron(epochs=500, early_stopping=False, verbose=False)
 evaluate(model, dataset, ratio=ratio, realizations=20)
 

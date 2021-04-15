@@ -1,13 +1,13 @@
 import random
-import helpers.math as math_helper
+from helpers.math import vector_sum, vector_scalar_product, matrix_product, step
 
 
 class Perceptron:
-    def __init__(self, learning_rate=00.1, epochs=50, early_stopping=True, verbose=False):
+    def __init__(self, learning_rate=0.01, epochs=50, early_stopping=True, verbose=False):
         self.learning_rate = learning_rate
         self.epochs = epochs
         self.weights = None
-        self.losses = None
+        self.errors = None
         self.early_stopping = early_stopping
         self.verbose = verbose
 
@@ -23,19 +23,18 @@ class Perceptron:
         return biased_row
 
     def initialize_weights(self, num_weights):
-        # random.uniform(0, 1)
-        self.weights = [0 for _ in range(num_weights)]
+        self.weights = [random.uniform(0, 1) for _ in range(num_weights)]
 
-    def optimize_weights(self, row, loss):
-        self.weights = math_helper.vector_sum(
-            self.weights,
-            math_helper.vector_scalar_product(self.biased_row(row), loss * self.learning_rate)
-        )
+    def optimize_weights(self, row, error):
+        # n * e * x
+        nex = vector_scalar_product(self.biased_row(row), error * self.learning_rate)
+        # w = w + (n * e * x)
+        self.weights = vector_sum(self.weights, nex)
 
     def predict(self, row):
         # Calculate activation function and output
-        u = math_helper.matrix_product(self.biased_row(row), self.weights)
-        return math_helper.step(u)
+        u = matrix_product(self.biased_row(row), self.weights)
+        return step(u)
 
     def log(self, *args, **kwargs):
         if self.verbose:
@@ -47,25 +46,25 @@ class Perceptron:
         num_features = len(training_set[0]) - 1
         num_weights = num_features + 1
         self.initialize_weights(num_weights)
-        self.losses = list()
+        self.errors = list()
 
         for epoch in range(self.epochs):
-            loss_sum = 0
+            error_sum = 0
             for row in training_set:
                 # Make prediction
                 y = self.predict(row[:-1])
 
-                # Calculate loss
-                loss = self.criterion(row[-1], y)
-                loss_sum += abs(loss)
+                # Calculate error
+                error = self.criterion(row[-1], y)
+                error_sum += abs(error)
 
                 # Update weights with the learning rule
-                self.optimize_weights(row[:-1], loss)
+                self.optimize_weights(row[:-1], error)
 
-            self.log("Epoch {}\nLoss: {:.2f}\n".format(epoch, loss_sum))
-            self.losses.append(loss_sum)
+            self.log("epoch {}, error: {:.2f}".format(epoch, error_sum))
+            self.errors.append(error_sum)
 
             # No errors in the epoch, no need to continue training
-            if self.early_stopping and loss_sum == 0:
+            if self.early_stopping and error_sum == 0:
                 self.log("Early stopping training in epoch {} as no mistakes were made".format(epoch))
                 break

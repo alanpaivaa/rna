@@ -28,6 +28,9 @@ def mean(vector):
 
 
 def standard_deviation(vector):
+    # Avoid zero division
+    if len(vector) == 1:
+        return 0
     m = mean(vector)
     mean_difference = map(lambda x: (x - m) ** 2, vector)
     return math.sqrt(reduce(lambda x, y: x + y, mean_difference) / (len(vector) - 1))
