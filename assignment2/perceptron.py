@@ -3,10 +3,12 @@ import helpers.math as math_helper
 
 
 class Perceptron:
-    def __init__(self, learning_rate=00.1, epochs=50):
+    def __init__(self, learning_rate=00.1, epochs=50, early_stopping=True):
         self.learning_rate = learning_rate
         self.epochs = epochs
         self.weights = None
+        self.losses = None
+        self.early_stopping = early_stopping
 
     @staticmethod
     def criterion(d, y):
@@ -40,6 +42,7 @@ class Perceptron:
         num_features = len(training_set[0]) - 1
         num_weights = num_features + 1
         self.initialize_weights(num_weights)
+        self.losses = list()
 
         for epoch in range(self.epochs):
             loss_sum = 0
@@ -55,8 +58,9 @@ class Perceptron:
                 self.optimize_weights(row[:-1], loss)
 
             print("Epoch {}:\nLoss: {:.2f}\n".format(epoch, loss_sum))
+            self.losses.append(loss_sum)
 
             # No errors in the epoch, no need to continue training
-            if loss_sum == 0:
+            if self.early_stopping and loss_sum == 0:
                 print("Early stopping training in epoch {} as no mistakes were made".format(epoch))
                 break
