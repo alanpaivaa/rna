@@ -57,6 +57,6 @@ dataset = Dataset('assignment2/datasets/iris.csv', encoding=iris_encodings[1])
 
 ratio = 0.8
 
-model = Perceptron(epochs=50, early_stopping=False)
+model = Perceptron(epochs=50, early_stopping=False, verbose=False)
 evaluate(model, dataset, ratio=ratio, realizations=20)
 

@@ -3,12 +3,13 @@ import helpers.math as math_helper
 
 
 class Perceptron:
-    def __init__(self, learning_rate=00.1, epochs=50, early_stopping=True):
+    def __init__(self, learning_rate=00.1, epochs=50, early_stopping=True, verbose=False):
         self.learning_rate = learning_rate
         self.epochs = epochs
         self.weights = None
         self.losses = None
         self.early_stopping = early_stopping
+        self.verbose = verbose
 
     @staticmethod
     def criterion(d, y):
@@ -36,6 +37,10 @@ class Perceptron:
         u = math_helper.matrix_product(self.biased_row(row), self.weights)
         return math_helper.step(u)
 
+    def log(self, *args, **kwargs):
+        if self.verbose:
+            print(*args, **kwargs)
+
     def train(self, training_set):
         # Initialize weights
         # Last column is considered to be the class value
@@ -57,10 +62,10 @@ class Perceptron:
                 # Update weights with the learning rule
                 self.optimize_weights(row[:-1], loss)
 
-            print("Epoch {}:\nLoss: {:.2f}\n".format(epoch, loss_sum))
+            self.log("Epoch {}\nLoss: {:.2f}\n".format(epoch, loss_sum))
             self.losses.append(loss_sum)
 
             # No errors in the epoch, no need to continue training
             if self.early_stopping and loss_sum == 0:
-                print("Early stopping training in epoch {} as no mistakes were made".format(epoch))
+                self.log("Early stopping training in epoch {} as no mistakes were made".format(epoch))
                 break
