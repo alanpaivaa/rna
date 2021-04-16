@@ -21,7 +21,7 @@ class Scores:
     def compute_confusion_matrix(self):
         self.confusion_matrix = [[0 for _ in range(self.num_classes)] for _ in range(self.num_classes)]
         for i in range(len(self.classes)):
-            self.confusion_matrix[self.classes[i]][self.predicted[i]] += 1
+            self.confusion_matrix[self.predicted[i]][self.classes[i]] += 1
 
     def max_digits_count(self):
         count = 0
