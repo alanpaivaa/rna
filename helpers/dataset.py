@@ -17,8 +17,14 @@ class Dataset:
                 row[-1] = unknown
         return dataset
 
+    @staticmethod
+    def set_last_column_int(dataset):
+        for row in dataset:
+            row[-1] = int(row[-1])
+
     def load(self):
         dataset = load_dataset(self.filename)
         if self.encoding is not None:
             dataset = self.encoded_classes(dataset)
+        self.set_last_column_int(dataset)
         return dataset
