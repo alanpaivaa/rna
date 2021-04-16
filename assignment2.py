@@ -4,6 +4,7 @@ from assignment2.perceptron import Perceptron
 from helpers.csv_helper import train_test_split
 import helpers.math as math_helper
 from helpers.scores import Scores
+from helpers.normalizer import normalize
 
 
 def evaluate(model, dataset, ratio=0.8, realizations=20):
@@ -13,8 +14,11 @@ def evaluate(model, dataset, ratio=0.8, realizations=20):
     errors = None
 
     for i in range(0, realizations):
+        full_dataset = dataset.load()
+        normalize(full_dataset, include_last_column=False)
+
         # Train the model
-        training_set, test_set = train_test_split(dataset.load(), ratio, shuffle=True)
+        training_set, test_set = train_test_split(full_dataset, ratio, shuffle=True)
         model.train(training_set)
 
         y = list()
@@ -50,19 +54,19 @@ def evaluate(model, dataset, ratio=0.8, realizations=20):
     plt.show()
 
 
-# # Iris dataset
-# iris_encodings = [
-#     {'Iris-setosa': 0},      # Binary: 0 - Setosa, 1 - Others
-#     {'Iris-versicolor': 0},  # Binary: 0 - Virginica, 1 - Others
-#     {'Iris-virginica': 0},   # Binary: 0 - Versicolor, 1 - Others
-#     {'Iris-setosa': 0, 'Iris-versicolor': 1, 'Iris-virginica': 2}  # Multiclass (doesn't make sense for perceptron)
-# ]
-# dataset = Dataset('assignment2/datasets/iris.csv', encoding=iris_encodings[1])
-
+# Iris dataset
 iris_encodings = [
-    {'R': 0, 'M': 1}
+    {'Iris-setosa': 0},      # Binary: 0 - Setosa, 1 - Others
+    {'Iris-versicolor': 0},  # Binary: 0 - Virginica, 1 - Others
+    {'Iris-virginica': 0},   # Binary: 0 - Versicolor, 1 - Others
+    {'Iris-setosa': 0, 'Iris-versicolor': 1, 'Iris-virginica': 2}  # Multiclass (doesn't make sense for perceptron)
 ]
-dataset = Dataset('assignment2/datasets/sonar.csv', encoding=iris_encodings[0])
+dataset = Dataset('assignment2/datasets/iris.csv', encoding=iris_encodings[1])
+
+# sonar_encodings = [
+#     {'R': 0, 'M': 1}
+# ]
+# dataset = Dataset('assignment2/datasets/sonar.csv', encoding=sonar_encodings[0])
 
 ratio = 0.8
 
