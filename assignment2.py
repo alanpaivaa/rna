@@ -53,8 +53,7 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20, draw_decision_surfa
     accuracies = list(map(lambda r: r.scores.accuracy, realizations))
     mean_accuracy = math_helper.mean(accuracies)
     std_accuracy = math_helper.standard_deviation(accuracies)
-    print("Mean accuracy: {:.2f}%".format(mean_accuracy * 100))
-    print("Accuracy standard deviation: {:.2f}%".format(std_accuracy * 100))
+    print("Accuracy: {:.2f}% ± {:.2f}%".format(mean_accuracy * 100, std_accuracy * 100))
 
     if not draw_decision_surface:
         plt.plot(errors)

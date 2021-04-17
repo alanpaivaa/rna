@@ -2,6 +2,9 @@ from assignment1.knn import KNN
 from assignment1.dmc import DMC
 from helpers.csv_helper import train_test_split
 from helpers.dataset import Dataset
+from helpers.realization import Realization
+from helpers.scores import Scores
+from helpers.math import mean, standard_deviation
 
 # Import plotting modules, if they're available
 try:
@@ -17,11 +20,12 @@ except ModuleNotFoundError:
 #   matplotlib 3.3.4
 
 
-def evaluate(model, dataset, ratio=0.8, rounds=1):
-    total_accuracy = 0
+def evaluate(model, dataset, ratio=0.8, num_realizations=20):
+    realizations = list()
 
-    for i in range(0, rounds):
-        correct_predictions = 0
+    for i in range(0, num_realizations):
+        classes = list()
+        predictions = list()
 
         # Train the model
         training_set, test_set = train_test_split(dataset.load(), ratio, shuffle=True)
@@ -29,14 +33,17 @@ def evaluate(model, dataset, ratio=0.8, rounds=1):
 
         # Test the model
         for row in test_set:
-            klass = row[-1]
-            predicted = model.predict(row[:-1])
-            if predicted == klass:
-                correct_predictions += 1
-        total_accuracy += correct_predictions / len(test_set)
+            predictions.append(model.predict(row[:-1]))
+            classes.append(row[-1])
 
-    average_accuracy = total_accuracy / rounds
-    print("Accuracy: {:.2f}%".format(average_accuracy * 100))
+        scores = Scores(classes, predictions)
+        realization = Realization(scores=scores)
+        realizations.append(realization)
+
+    accuracies = [r.scores.accuracy for r in realizations]
+    m = mean(accuracies)
+    std = standard_deviation(accuracies)
+    print("Accuracy: {:.2f}% ± {:.2f}%".format(m * 100, std * 100))
 
 
 def plot_evaluate(model, dataset, ratio=0.8, cols=(0, 1)):
@@ -76,14 +83,14 @@ iris_encodings = [
     {'Iris-virginica': 0},   # Binary: 0 - Versicolor, 1 - Others
     {'Iris-setosa': 0, 'Iris-versicolor': 1, 'Iris-virginica': 2}  # Multiclass
 ]
-dataset = Dataset('assignment1/datasets/iris.csv', encoding=iris_encodings[3])
+dataset = Dataset('assignment1/datasets/iris.csv', encoding=iris_encodings[1])
 
 # Artificial dataset
 # dataset = Dataset('assignment1/datasets/artificial.csv')
 
 # Params
 train_test_ratio = 0.8
-evaluation_rounds = 10
+evaluation_rounds = 20
 
 # KNN
 model = KNN(7)
@@ -92,7 +99,7 @@ model = KNN(7)
 # model = DMC()
 
 # Calculate average accuracy for the model
-evaluate(model, dataset, ratio=train_test_ratio, rounds=evaluation_rounds)
+evaluate(model, dataset, ratio=train_test_ratio, num_realizations=evaluation_rounds)
 
 # Plot decision surface
 if plotting_available:

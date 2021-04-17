@@ -1,6 +1,7 @@
 from functools import reduce
 import math
 
+
 def matrix_product(a, b):
     acc = 0
     for (i, j) in zip(a, b):
