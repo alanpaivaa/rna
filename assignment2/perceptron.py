@@ -50,6 +50,8 @@ class Perceptron:
 
         for epoch in range(self.epochs):
             error_sum = 0
+            random.shuffle(training_set)
+
             for row in training_set:
                 # Make prediction
                 y = self.predict(row[:-1])
