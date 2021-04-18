@@ -125,7 +125,7 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20, draw_decision_surfa
     realizations[cia].scores.print_confusion_matrix()
 
     if plotting_available and not draw_decision_surface:
-        plt.plot(errors)
+        plt.plot(range(1, len(errors) + 1), errors)
         plt.xlabel("Épocas")
         plt.ylabel("Soma dos erros")
         plt.show()
@@ -138,7 +138,7 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20, draw_decision_surfa
 
         plot_decision_surface(model, realizations[cia].training_set + realizations[cia].test_set,
                               offset=0.2, xlabel="X", ylabel="Y",
-                              title="Superfície de Decisão", legend={0: '0', 1: '1'})
+                              title="Perceptron")
 
 
 # Iris dataset
@@ -146,9 +146,8 @@ iris_encodings = [
     {'Iris-setosa': 0},      # Binary: 0 - Setosa, 1 - Others
     {'Iris-versicolor': 0},  # Binary: 0 - Virginica, 1 - Others
     {'Iris-virginica': 0},   # Binary: 0 - Versicolor, 1 - Others
-    {'Iris-setosa': 0, 'Iris-versicolor': 1, 'Iris-virginica': 2}  # Multiclass (doesn't make sense for perceptron)
 ]
-dataset = Dataset('assignment2/datasets/iris.csv', encoding=iris_encodings[1])
+dataset = Dataset('assignment2/datasets/iris.csv', encoding=iris_encodings[0])
 
 # sonar_encodings = [
 #     {'R': 0, 'M': 1}
@@ -161,10 +160,12 @@ draw_decision_surface = "artificial" in dataset.filename
 
 learning_rate = 0.01
 ratio = 0.8
-epochs = 500
+epochs = 100  # Setosa, virginica, artificial
+# epochs = 10   # Versicolor
+
 
 # select_training_hyper_parameters(dataset)
 
-model = Perceptron(epochs=epochs, learning_rate=learning_rate, early_stopping=False, verbose=False)
+model = Perceptron(epochs=epochs, learning_rate=learning_rate, early_stopping=True, verbose=False)
 evaluate(model, dataset, ratio=ratio, num_realizations=20, draw_decision_surface=draw_decision_surface)
 
