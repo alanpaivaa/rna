@@ -1,12 +1,24 @@
-import matplotlib.pyplot as plt
 from helpers.dataset import Dataset
 from assignment2.perceptron import Perceptron
 from helpers.csv_helper import train_test_split
 import helpers.math as math_helper
 from helpers.scores import Scores
 from helpers.normalizer import normalize
-from helpers.plot_helper import plot_decision_surface
 from helpers.realization import Realization
+
+# Import plotting modules, if they're available
+try:
+    from helpers.plot_helper import plot_decision_surface
+    import matplotlib.pyplot as plt
+    plotting_available = True
+except ModuleNotFoundError:
+    plotting_available = False
+
+# Requirements
+# Minimum: Python 3.9.2
+# Optional (only required for plotting graphs):
+#   numpy 1.20.2
+#   matplotlib 3.3.4
 
 
 def select_training_hyper_parameters(dataset, ratio=0.8, num_folds=5):
@@ -112,13 +124,13 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20, draw_decision_surfa
     print("Confusion matrix closest to the mean accuracy")
     realizations[cia].scores.print_confusion_matrix()
 
-    if not draw_decision_surface:
+    if plotting_available and not draw_decision_surface:
         plt.plot(errors)
         plt.xlabel("Épocas")
         plt.ylabel("Soma dos erros")
         plt.show()
 
-    if draw_decision_surface:
+    if plotting_available and draw_decision_surface:
         # Set models with the "mean weights"
         model.weights = realizations[cia].weights
         # print([[round(n, 4) for n in row] for row in realizations[cia].training_set])
