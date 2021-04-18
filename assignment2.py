@@ -136,9 +136,9 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20, draw_decision_surfa
         # print([[round(n, 4) for n in row] for row in realizations[cia].training_set])
         # print([[round(n, 4) for n in row] for row in realizations[cia].test_set])
 
-        plot_decision_surface(model, realizations[cia].training_set + realizations[cia].test_set,
+        plot_decision_surface(model, realizations[cia].training_set, realizations[cia].test_set,
                               offset=0.2, xlabel="X", ylabel="Y",
-                              title="Perceptron")
+                              title="Perceptron", legend={0: '0', 1: '1'})
 
 
 # Iris dataset
@@ -148,11 +148,6 @@ iris_encodings = [
     {'Iris-virginica': 0},   # Binary: 0 - Versicolor, 1 - Others
 ]
 dataset = Dataset('assignment2/datasets/iris.csv', encoding=iris_encodings[0])
-
-# sonar_encodings = [
-#     {'R': 0, 'M': 1}
-# ]
-# dataset = Dataset('assignment2/datasets/sonar.csv', encoding=sonar_encodings[0])
 
 # dataset = Dataset('assignment2/datasets/artificial.csv')
 
