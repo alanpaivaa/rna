@@ -58,7 +58,7 @@ class Perceptron:
 
                 # Calculate error
                 error = self.criterion(row[-1], y)
-                error_sum += abs(error)
+                error_sum += error ** 2
 
                 # Update weights with the learning rule
                 self.optimize_weights(row[:-1], error)
