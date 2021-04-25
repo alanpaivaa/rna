@@ -1,4 +1,4 @@
-from csv import reader
+from csv import reader, writer, QUOTE_MINIMAL
 import random
 
 
@@ -21,6 +21,13 @@ def load_dataset(filename):
             except ValueError:
                 pass
     return dataset
+
+
+def write_dataset(dataset, filename):
+    with open(filename, mode='w') as file:
+        dataset_writer = writer(file, delimiter=',', quotechar='"', quoting=QUOTE_MINIMAL)
+        for row in dataset:
+            dataset_writer.writerow(row)
 
 
 def train_test_split(dataset, ratio=0.8, shuffle=False):
