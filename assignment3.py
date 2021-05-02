@@ -104,7 +104,7 @@ dataset = Dataset('assignment3/datasets/artificial1.csv')
 
 learning_rate = 0.01
 ratio = 0.8
-epochs = 75
+epochs = 100
 
 model = Adaline(epochs=epochs, learning_rate=learning_rate, early_stopping=True, verbose=False)
 evaluate(model, dataset.load(), ratio=ratio, num_realizations=20)
