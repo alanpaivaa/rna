@@ -4,6 +4,7 @@ from helpers.realization import Realization
 from helpers.scores import Scores
 from assignment3.adaline import Adaline
 from helpers.normalizer import normalize
+from helpers.plot_helper import plot_regression_surface
 
 # Import plotting modules, if they're available
 try:
@@ -72,11 +73,15 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20, draw_decision_surfa
     #     if abs(mean_accuracy - accuracies[i]) < abs(mean_accuracy - accuracies[cia]):
     #         cia = i
 
-    if plotting_available:
-        plt.plot(range(1, len(errors) + 1), errors)
-        plt.xlabel("Épocas")
-        plt.ylabel("Soma dos erros")
-        plt.show()
+    # if plotting_available:
+    #     plt.plot(range(1, len(errors) + 1), errors)
+    #     plt.xlabel("Épocas")
+    #     plt.ylabel("Soma dos erros")
+    #     plt.show()e:
+    #     plt.plot(range(1, len(errors) + 1), errors)
+    #     plt.xlabel("Épocas")
+    #     plt.ylabel("Soma dos erros")
+    #     plt.show()
 
     if plotting_available:
         # Set models with the "mean weights"
@@ -86,18 +91,22 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20, draw_decision_surfa
         # print(realization.training_set)
         # print(realization.test_set)
 
-        import numpy as np
+        # ***** Old Code
+        # import numpy as np
+        #
+        # points = np.array(realization.training_set + realization.test_set)
+        # points_x = points[:, 0]
+        # points_y = points[:, 1]
+        # plt.scatter(points_x, points_y)
+        #
+        # space_x = np.linspace(0, 1, 100)
+        # space_y = np.array([model.predict([row]) for row in space_x])
+        # plt.plot(space_x, space_y, color='g')
+        # plt.show()
 
-        points = np.array(realization.training_set + realization.test_set)
-        points_x = points[:, 0]
-        points_y = points[:, 1]
-        plt.scatter(points_x, points_y)
+        plot_regression_surface(model, realization.training_set + realization.test_set)
 
-        space_x = np.linspace(0, 1, 100)
-        space_y = np.array([model.predict([row]) for row in space_x])
-        plt.plot(space_x, space_y, color='g')
         plt.show()
-
 
 
 
@@ -105,10 +114,10 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20, draw_decision_surfa
 # generate_datasets()
 
 # Artificial 1
-dataset = Dataset('assignment3/datasets/artificial1.csv')
+# dataset = Dataset('assignment3/datasets/artificial1.csv')
 
 # Artificial 2
-# dataset = Dataset('assignment3/datasets/artificial2.csv')
+dataset = Dataset('assignment3/datasets/artificial2.csv')
 
 draw_decision_surface = False#"artificial" in dataset.filename
 

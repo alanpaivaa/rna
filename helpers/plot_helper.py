@@ -92,3 +92,50 @@ def plot_decision_surface(model, test_set, extra_set=list(), offset=0.0, title=N
         plt.show()
     else:
         plt.savefig(filename)
+
+
+def plot_regression_surface(model, dataset, x_label='X', y_label='Y', z_label='Z'):
+    dataset = np.array(dataset)
+
+    is_3d = dataset.shape[1] == 3
+
+    # Get x and y columns
+    x = dataset[:, 0]
+    y = dataset[:, 1]
+
+    z = None
+    if is_3d:
+        z = dataset[:, 2]
+
+    if is_3d:
+        ax = plt.axes(projection="3d")
+    else:
+        ax = plt.axes()
+
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+
+    if is_3d:
+        ax.set_zlabel(z_label)
+
+    # Draw dataset points
+    if is_3d:
+        ax.scatter3D(x, y, z)
+    else:
+        ax.scatter(x, y)
+
+    green = (0, .5, 0, .7)
+    if is_3d:
+        space_x, space_y, space_z = list(), list(), list()
+        for sx in np.linspace(np.min(x), np.max(x), 100):
+            for sy in np.linspace(np.min(y), np.max(y), 100):
+                space_x.append(sx)
+                space_y.append(sy)
+                space_z.append(model.predict([sx, sy]))
+        ax.plot3D(space_x, space_y, space_z, color=green)
+    else:
+        space_x = np.linspace(np.min(x), np.max(x), 1000)
+        space_y = np.array([model.predict([row]) for row in space_x])
+        ax.plot(space_x, space_y, color=green)
+
+    plt.show()
