@@ -32,22 +32,45 @@ class Dataset:
         return dataset
 
 
-def generate_regression_dataset(num_samples, coefficients, x_step=1, x_noise=.5, y_noise=5):
-    dims = len(coefficients) - 1
+def generate_regression_dataset(num_samples, ranges, coefficients, noise=.0):
+    # Generate linear spaces
+    lin_spaces = list()
+    space_size = 1000
+    for r in ranges:
+        space = (r[1] - r[0]) / (space_size - 1)
+        lin_spaces.append([r[0]] + [r[0] + space * i for i in range(1, space_size)])
 
-    x = [[x_step + x_noise for _ in range(dims)]]
-    while len(x) < num_samples:
-        last_x = x[-1]
-        steps = [x_step + random.uniform(0, x_noise) for _ in range(dims)]
-        x.append(vector_sum(last_x, steps))
-    x = [[round(number, 2) for number in row] for row in x]
+    # Round decimal places of lin space
+    # lin_spaces = [[round(number, 2) for number in row] for row in lin_spaces]
 
+    # Generates coordinates based on each lin space axes
+    coordinates = list()
+    generate_coordinates(lin_spaces, 0, [], coordinates)
+
+    # Sample coordinates from lin space
+    random.shuffle(coordinates)
+    coordinates = coordinates[:num_samples]
+
+    # Generate last coordinate based on function coefficients
     y = list()
-    for row in x:
-        fx = matrix_product(coefficients, row + [1])
-        fx += random.uniform(-y_noise, y_noise)
-        fx = round(fx, 2)
+    for coordinate in coordinates:
+        fx = matrix_product(coefficients, coordinate + [1])
+        fx += random.uniform(-noise, noise)
+        # fx = round(fx, 2)
         y.append(fx)
 
-    dataset = [row_x + [row_y] for row_x, row_y in zip(x, y)]
+    dataset = [row_x + [row_y] for row_x, row_y in zip(coordinates, y)]
     return dataset
+
+
+def generate_coordinates(lin_spaces, i, curr, res):
+    if i >= len(lin_spaces):
+        res.append(curr.copy())
+        return
+
+    for x in lin_spaces[i]:
+        curr.append(x)
+        generate_coordinates(lin_spaces, i + 1, curr, res)
+        curr.pop()
+
+

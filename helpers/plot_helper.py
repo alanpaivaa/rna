@@ -124,7 +124,6 @@ def plot_regression_surface(model, dataset, x_label='X', y_label='Y', z_label='Z
     else:
         ax.scatter(x, y)
 
-    green = (0, .5, 0, .7)
     if is_3d:
         space_x, space_y, space_z = list(), list(), list()
         for sx in np.linspace(np.min(x), np.max(x), 100):
@@ -132,10 +131,10 @@ def plot_regression_surface(model, dataset, x_label='X', y_label='Y', z_label='Z
                 space_x.append(sx)
                 space_y.append(sy)
                 space_z.append(model.predict([sx, sy]))
-        ax.plot3D(space_x, space_y, space_z, color=green)
+        ax.plot3D(space_x, space_y, space_z, color=(0, .5, 0, .3))
     else:
         space_x = np.linspace(np.min(x), np.max(x), 1000)
         space_y = np.array([model.predict([row]) for row in space_x])
-        ax.plot(space_x, space_y, color=green)
+        ax.plot(space_x, space_y, color='green')
 
     plt.show()
