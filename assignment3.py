@@ -3,7 +3,7 @@ from helpers.csv_helper import write_dataset, train_test_split
 from helpers.realization import Realization
 from helpers.scores import RegressionScores
 from assignment3.adaline import Adaline
-from helpers.normalizer import normalize
+from helpers.normalizer import Normalizer
 from helpers.math import mean, standard_deviation
 from helpers.plot_helper import plot_regression_surface
 
@@ -33,14 +33,16 @@ def generate_datasets():
 
 
 def evaluate(model, dataset, ratio=0.8, num_realizations=20):
+    # Setup normalizer
+    normalizer = Normalizer()
+    normalizer.fit(dataset)
+    normalized_dataset = [normalizer.normalize(row) for row in dataset]
+
     realizations = list()
 
     for i in range(0, num_realizations):
-        full_dataset = dataset.load()
-        normalize(full_dataset, include_last_column=True)
-
         # Train the model
-        training_set, test_set = train_test_split(full_dataset, ratio, shuffle=True)
+        training_set, test_set = train_test_split(normalized_dataset, ratio, shuffle=True)
         model.train(training_set)
 
         y = list()
@@ -88,7 +90,7 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
     if plotting_available:
         # Set models with the "mean weights"
         model.weights = avg_realization.weights
-        plot_regression_surface(model, avg_realization.training_set + avg_realization.test_set)
+        plot_regression_surface(model, normalizer, avg_realization.training_set + avg_realization.test_set)
 
 
 # Generate datasets artificial 1 and 2
@@ -102,8 +104,8 @@ dataset = Dataset('assignment3/datasets/artificial1.csv')
 
 learning_rate = 0.01
 ratio = 0.8
-epochs = 100
+epochs = 75
 
 model = Adaline(epochs=epochs, learning_rate=learning_rate, early_stopping=True, verbose=False)
-evaluate(model, dataset, ratio=ratio, num_realizations=20)
+evaluate(model, dataset.load(), ratio=ratio, num_realizations=20)
 print("Done!")

@@ -94,7 +94,7 @@ def plot_decision_surface(model, test_set, extra_set=list(), offset=0.0, title=N
         plt.savefig(filename)
 
 
-def plot_regression_surface(model, dataset, x_label='X', y_label='Y', z_label='Z'):
+def plot_regression_surface(model, normalizer, dataset, x_label='X', y_label='Y', z_label='Z'):
     dataset = np.array(dataset)
 
     is_3d = dataset.shape[1] == 3
@@ -120,9 +120,14 @@ def plot_regression_surface(model, dataset, x_label='X', y_label='Y', z_label='Z
 
     # Draw dataset points
     if is_3d:
-        ax.scatter3D(x, y, z)
+        rows = [[x[i], y[i], z[i]] for i in range(len(x))]
+        rows = np.array([normalizer.denormalize(row) for row in rows])
+        ax.scatter3D(rows[:, 0], rows[:, 1], rows[:, 2])
     else:
-        ax.scatter(x, y)
+        # De-normalizing
+        rows = [[a, b] for a, b in zip(x, y)]
+        rows = np.array([normalizer.denormalize(row) for row in rows])
+        ax.scatter(rows[:, 0], rows[:, 1])
 
     if is_3d:
         space_x, space_y, space_z = list(), list(), list()
@@ -131,10 +136,17 @@ def plot_regression_surface(model, dataset, x_label='X', y_label='Y', z_label='Z
                 space_x.append(sx)
                 space_y.append(sy)
                 space_z.append(model.predict([sx, sy]))
-        ax.plot3D(space_x, space_y, space_z, color=(0, .5, 0, .3))
+        rows = [[space_x[i], space_y[i], space_z[i]] for i in range(len(space_x))]
+        rows = np.array([normalizer.denormalize(row) for row in rows])
+        ax.plot3D(rows[:, 0], rows[:, 1], rows[:, 2], color=(0, .5, 0, .3))
     else:
         space_x = np.linspace(np.min(x), np.max(x), 1000)
         space_y = np.array([model.predict([row]) for row in space_x])
-        ax.plot(space_x, space_y, color='green')
+
+        # De-normalizing
+        rows = [[a, b] for a, b in zip(space_x, space_y)]
+        rows = np.array([normalizer.denormalize(row) for row in rows])
+
+        ax.plot(rows[:, 0], rows[:, 1], color='green')
 
     plt.show()
