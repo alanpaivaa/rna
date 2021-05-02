@@ -31,7 +31,7 @@ def generate_datasets():
     write_dataset(artificial2, 'assignment3/datasets/artificial2.csv')
 
 
-def evaluate(model, dataset, ratio=0.8, num_realizations=20, draw_decision_surface=False):
+def evaluate(model, dataset, ratio=0.8, num_realizations=20):
     # max_scores = None
     errors = None
     realizations = list()
@@ -79,41 +79,19 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20, draw_decision_surfa
     #     if abs(mean_accuracy - accuracies[i]) < abs(mean_accuracy - accuracies[cia]):
     #         cia = i
 
-    # if plotting_available:
-    #     plt.plot(range(1, len(errors) + 1), errors)
-    #     plt.xlabel("Épocas")
-    #     plt.ylabel("Soma dos erros")
-    #     plt.show()e:
-    #     plt.plot(range(1, len(errors) + 1), errors)
-    #     plt.xlabel("Épocas")
-    #     plt.ylabel("Soma dos erros")
-    #     plt.show()
+    # Plot error sum plot
+    if plotting_available:
+        plt.plot(range(1, len(errors) + 1), errors)
+        plt.xlabel("Épocas")
+        plt.ylabel("Soma dos erros")
+        plt.show()
 
+    # Plot decision surface
     if plotting_available:
         # Set models with the "mean weights"
         realization = realizations[-1]
         # model.weights = realization.weights # TODO: Take proper realization
-
-        # print(realization.training_set)
-        # print(realization.test_set)
-
-        # ***** Old Code
-        # import numpy as np
-        #
-        # points = np.array(realization.training_set + realization.test_set)
-        # points_x = points[:, 0]
-        # points_y = points[:, 1]
-        # plt.scatter(points_x, points_y)
-        #
-        # space_x = np.linspace(0, 1, 100)
-        # space_y = np.array([model.predict([row]) for row in space_x])
-        # plt.plot(space_x, space_y, color='g')
-        # plt.show()
-
         plot_regression_surface(model, realization.training_set + realization.test_set)
-
-        plt.show()
-
 
 
 # Generate datasets artificial 1 and 2
@@ -125,12 +103,10 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20, draw_decision_surfa
 # Artificial 2
 dataset = Dataset('assignment3/datasets/artificial2.csv')
 
-draw_decision_surface = False#"artificial" in dataset.filename
-
 learning_rate = 0.01
 ratio = 0.8
 epochs = 100
 
 model = Adaline(epochs=epochs, learning_rate=learning_rate, early_stopping=True, verbose=True)
-evaluate(model, dataset, ratio=ratio, num_realizations=1, draw_decision_surface=draw_decision_surface)
+evaluate(model, dataset, ratio=ratio, num_realizations=1)
 print("Done!")
