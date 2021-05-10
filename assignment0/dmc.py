@@ -1,4 +1,4 @@
-from assignment1.knn import KNN
+from assignment0.knn import KNN
 
 
 class DMC(KNN):

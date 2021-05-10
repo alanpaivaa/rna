@@ -1,4 +1,4 @@
-from assignment2.perceptron import Perceptron
+from assignment1.perceptron import Perceptron
 from helpers.math import matrix_product
 
 
