@@ -90,7 +90,12 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
     if plotting_available:
         # Set models with the "mean weights"
         model.weights = avg_realization.weights
-        plot_regression_surface(model, normalizer, avg_realization.training_set + avg_realization.test_set)
+        plot_regression_surface(model,
+                                normalizer,
+                                avg_realization.training_set + avg_realization.test_set,
+                                x_label="X", y_label="Y",
+                                scatter_label='Base de dados',
+                                model_label='Predição do modelo', title='Artificial I')
 
 
 # Generate datasets artificial 1 and 2
