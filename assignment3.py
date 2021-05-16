@@ -1,6 +1,8 @@
 import random
 from assignment3.helpers import sample_points
 from assignment3.helpers import write_dataset
+from assignment3.dataset import Dataset
+from assignment3.perceptron_network import PerceptronNetwork
 
 # Import plotting modules, if they're available
 try:
@@ -43,5 +45,12 @@ def generate_artificial_dataset():
     write_dataset(dataset, "assignment3/datasets/artificial.csv")
 
 
-generate_artificial_dataset()
+# Generate artificial dataset
+# generate_artificial_dataset()
+
+dataset = Dataset("assignment3/datasets/artificial.csv")
+
+model = PerceptronNetwork()
+model.train(dataset.load())
+
 print("Done!")
