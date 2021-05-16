@@ -2,9 +2,20 @@ from assignment3.helpers import load_dataset
 
 
 class Dataset:
-    def __init__(self, filename, encoding=None):
+    def __init__(self, filename):
         self.filename = filename
-        self.encoding = encoding
+        self.encoding = None
+
+    def generate_encoding(self, dataset):
+        if type(dataset[0][-1]) != str:
+            return
+
+        self.encoding = dict()
+        encoding_set = set()
+        for row in dataset:
+            if row[-1] not in encoding_set:
+                self.encoding[row[-1]] = len(encoding_set)
+                encoding_set.add(row[-1])
 
     def encoded_classes(self, dataset):
         # For values not contained in the encoding dict, we use the value max + 1
@@ -24,6 +35,8 @@ class Dataset:
 
     def load(self):
         dataset = load_dataset(self.filename)
+
+        self.generate_encoding(dataset)
         if self.encoding is not None:
             dataset = self.encoded_classes(dataset)
         self.set_last_column_int(dataset)

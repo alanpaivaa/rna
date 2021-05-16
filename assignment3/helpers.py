@@ -5,6 +5,7 @@ import random
 from functools import reduce
 import math
 
+
 def load_csv(filename):
     dataset = []
     with open(filename, 'r') as file:
