@@ -24,6 +24,7 @@ def load_dataset(filename):
                 pass
     return dataset
 
+
 def write_dataset(dataset, filename):
     with open(filename, mode='w') as file:
         dataset_writer = csv_writer(file, delimiter=',', quotechar='"', quoting=QUOTE_MINIMAL)
@@ -46,3 +47,11 @@ def sample_points(num_samples, x_range, y_range, space_size):
 
     # Sample coordinates
     return random.choices(coordinates, k=num_samples)
+
+
+def shape(tensor):
+    l0 = len(tensor)
+    if l0 <= 1:
+        return l0
+    l1 = len(tensor[0])
+    return l0, l1
