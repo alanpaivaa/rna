@@ -4,6 +4,7 @@ from assignment3.dataset import Dataset
 from assignment3.perceptron_network import PerceptronNetwork
 from assignment3.realization import Realization
 from assignment3.scores import Scores
+from assignment3.normalizer import Normalizer
 
 # Import plotting modules, if they're available
 try:
@@ -47,11 +48,9 @@ def generate_artificial_dataset():
 
 
 def evaluate(model, dataset, ratio=0.8, num_realizations=20):
-    # TODO: Setup normalizer
-    # normalizer = Normalizer()
-    # normalizer.fit(dataset)
-    # normalized_dataset = [normalizer.normalize(row) for row in dataset]
-    normalized_dataset = dataset
+    normalizer = Normalizer()
+    normalizer.fit(dataset)
+    normalized_dataset = [normalizer.normalize(row[:-1]) + [row[-1]] for row in dataset]
 
     realizations = list()
 
