@@ -109,7 +109,7 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
 # Generate artificial dataset
 # generate_artificial_dataset()
 
-dataset = Dataset("assignment3/datasets/dermatology.csv")
+dataset = Dataset("assignment3/datasets/breast-cancer.csv")
 
 model = PerceptronNetwork(learning_rate=0.01, epochs=100, early_stopping=True, verbose=False)
 evaluate(model, dataset.load(), ratio=0.8, num_realizations=20)
