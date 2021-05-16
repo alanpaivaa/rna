@@ -33,12 +33,17 @@ class PerceptronNetwork:
     def one_hot_encode(self, rows):
         assert self.one_hot_encodings is not None
 
+        result = list()
         for row in rows:
             klass = row[-1]
             encoding = self.one_hot_encodings[klass]
-            row.pop()
+            row_copy = row.copy()
+            row_copy.pop()
             for i in encoding:
-                row.append(i)
+                row_copy.append(i)
+            result.append(row_copy)
+
+        return result
 
     def generate_weights(self):
         assert self.c is not None
@@ -73,7 +78,7 @@ class PerceptronNetwork:
         return y_values
 
     def predict(self, row):
-        y_values = self.predict_one_hot(row)
+        y_values = self.predict_one_hot(row + [-1])
         for i in range(len(y_values)):
             if y_values[i] == 1:
                 return i
@@ -92,8 +97,8 @@ class PerceptronNetwork:
         assert len(training_set[0]) > 0
 
         self.generate_one_hot_encodings(training_set)
-        self.one_hot_encode(training_set)
-        self.p = len(training_set[0]) - self.c + 1
+        one_hot_training_set = self.one_hot_encode(training_set)
+        self.p = len(one_hot_training_set[0]) - self.c + 1
 
         self.generate_weights()
 
@@ -101,9 +106,9 @@ class PerceptronNetwork:
 
         for epoch in range(self.epochs):
             error_sum = 0
-            random.shuffle(training_set)
+            random.shuffle(one_hot_training_set)
 
-            for row in training_set:
+            for row in one_hot_training_set:
                 # Get the features with bias
                 x_t = [row[:-self.c] + [-1]]          # Shape: (1, p)
 

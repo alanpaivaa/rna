@@ -2,7 +2,8 @@ from csv import writer as csv_writer
 from csv import reader as csv_reader
 from csv import QUOTE_MINIMAL
 import random
-
+from functools import reduce
+import math
 
 def load_csv(filename):
     dataset = []
@@ -99,3 +100,26 @@ def matrix_t(a):
         for j in range(cols):
             result[j][i] = a[i][j]
     return result
+
+
+def mean(vector):
+    return reduce(lambda x, y: x + y, vector) / len(vector)
+
+
+def standard_deviation(vector):
+    # Avoid zero division
+    if len(vector) == 1:
+        return 0
+    m = mean(vector)
+    mean_difference = map(lambda x: (x - m) ** 2, vector)
+    return math.sqrt(reduce(lambda x, y: x + y, mean_difference) / (len(vector) - 1))
+
+
+def train_test_split(dataset, ratio=0.8, shuffle=False):
+    dataset_copy = dataset.copy()
+    if shuffle:
+        random.shuffle(dataset_copy)
+    train_index = int(len(dataset_copy) * ratio)
+    training_set = dataset_copy[:train_index]
+    test_set = dataset_copy[train_index:]
+    return training_set, test_set
