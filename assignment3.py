@@ -50,7 +50,10 @@ def generate_artificial_dataset():
 
 dataset = Dataset("assignment3/datasets/artificial.csv")
 
-model = PerceptronNetwork()
-model.train(dataset.load())
+dataset = dataset.load()
+# TODO: Normalization)
+
+model = PerceptronNetwork(learning_rate=0.01, epochs=100, early_stopping=True, verbose=True)
+model.train(dataset)
 
 print("Done!")
