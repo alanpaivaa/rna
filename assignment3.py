@@ -8,7 +8,7 @@ from assignment3.normalizer import Normalizer
 
 # Import plotting modules, if they're available
 try:
-    from helpers.plot_helper import plot_decision_surface
+    from assignment3.plot_helper import plot_decision_surface
     import matplotlib.pyplot as plt
     plotting_available = True
 except ModuleNotFoundError:
@@ -95,21 +95,21 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
         plt.show()
 
     # Plot decision surface
-    # if plotting_available:
-    #     # Set models with the "mean weights"
-    #     model.weights = avg_realization.weights
-    #     plot_regression_surface(model,
-    #                             normalizer,
-    #                             avg_realization.training_set + avg_realization.test_set,
-    #                             x_label="X", y_label="Y",
-    #                             scatter_label='Base de dados',
-    #                             model_label='Predição do modelo', title='Artificial I')
+    if len(dataset[0][:-1]) == 2 and plotting_available:
+        # Set models with the "mean weights"
+        model.weights = avg_realization.weights
+        plot_decision_surface(model,
+                              normalized_dataset,
+                              offset=0.2,
+                              title="Superfície de Decisão",
+                              xlabel="X1",
+                              ylabel="X2")
 
 
 # Generate artificial dataset
 # generate_artificial_dataset()
 
-dataset = Dataset("assignment3/datasets/breast-cancer.csv")
+dataset = Dataset("assignment3/datasets/artificial.csv")
 
 model = PerceptronNetwork(learning_rate=0.01, epochs=100, early_stopping=True, verbose=False)
 evaluate(model, dataset.load(), ratio=0.8, num_realizations=20)
