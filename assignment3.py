@@ -51,6 +51,7 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
     normalizer = Normalizer()
     normalizer.fit(dataset)
     normalized_dataset = [normalizer.normalize(row[:-1]) + [row[-1]] for row in dataset]
+    # normalized_dataset = dataset
 
     realizations = list()
 
@@ -90,6 +91,7 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
     # Plot error sum plot
     if plotting_available:
         plt.plot(range(1, len(avg_realization.errors) + 1), avg_realization.errors)
+        plt.title("Iris")
         plt.xlabel("Épocas")
         plt.ylabel("Soma dos erros")
         plt.show()
@@ -110,6 +112,10 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
 # generate_artificial_dataset()
 
 dataset = Dataset("assignment3/datasets/artificial.csv")
+# dataset = Dataset("assignment3/datasets/breast-cancer.csv")
+# dataset = Dataset("assignment3/datasets/dermatology.csv")
+# dataset = Dataset("assignment3/datasets/vertebral-column.csv")
+# dataset = Dataset("assignment3/datasets/iris.csv")
 
 model = PerceptronNetwork(learning_rate=0.01, epochs=100, early_stopping=True, verbose=False)
 evaluate(model, dataset.load(), ratio=0.8, num_realizations=20)
