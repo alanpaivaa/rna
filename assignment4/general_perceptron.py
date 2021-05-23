@@ -1,19 +1,19 @@
 import random
-from assignment4.helpers import vector_sum, vector_scalar_product, matrix_product
+from assignment4.helpers import vector_sum, vector_scalar_product, matrix_product, step
 
 
 class GeneralPerceptron:
-    def __init__(self, learning_rate=0.01, epochs=50, early_stopping=True, verbose=False):
+    def __init__(self, activation_function, learning_rate=0.01, epochs=50, early_stopping=True, verbose=False):
+        self.activation_function = activation_function
         self.learning_rate = learning_rate
         self.epochs = epochs
-        self.weights = None
-        self.errors = None
         self.early_stopping = early_stopping
         self.verbose = verbose
+        self.weights = None
+        self.errors = None
 
-    @staticmethod
-    def criterion(d, y):
-        return d - y
+    def criterion(self, d, y):
+        return self.activation_function.transform_class(d) - y
 
     @staticmethod
     def biased_row(row):
@@ -25,15 +25,24 @@ class GeneralPerceptron:
     def initialize_weights(self, num_weights):
         self.weights = [random.uniform(0, 1) for _ in range(num_weights)]
 
-    def optimize_weights(self, row, error):
-        # n * e * x
-        nex = vector_scalar_product(self.biased_row(row), error * self.learning_rate)
-        # w = w + (n * e * x)
-        self.weights = vector_sum(self.weights, nex)
+    def optimize_weights(self, x, y, error):
+        # Get y derivative
+        y_derivative = self.activation_function.derivative(y)
+
+        # n * e * y' * x
+        neyx = vector_scalar_product(self.biased_row(x), self.learning_rate * error * y_derivative)
+
+        # w = w + (n * e * y' * x)
+        self.weights = vector_sum(self.weights, neyx)
+
+    def train_predict(self, row):
+        # Calculate activation function and output
+        summation = matrix_product(self.biased_row(row), self.weights)
+        return self.activation_function.activate(summation)
 
     def predict(self, row):
-        # Calculate activation function and output
-        return matrix_product(self.biased_row(row), self.weights)
+        prob = self.train_predict(row)
+        return self.activation_function.step(prob)
 
     def log(self, *args, **kwargs):
         if self.verbose:
@@ -53,7 +62,7 @@ class GeneralPerceptron:
 
             for row in training_set:
                 # Make prediction
-                y = self.predict(row[:-1])
+                y = self.train_predict(row[:-1])
 
                 # Calculate error
                 error = self.criterion(row[-1], y)
@@ -63,7 +72,7 @@ class GeneralPerceptron:
                     error_sum = float('inf')
 
                 # Update weights with the learning rule
-                self.optimize_weights(row[:-1], error)
+                self.optimize_weights(row[:-1], y, error)
 
             self.log("epoch {}, error: {:.2f}".format(epoch, error_sum))
             self.errors.append(error_sum)
