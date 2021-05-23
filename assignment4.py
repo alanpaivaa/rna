@@ -1,3 +1,5 @@
+import random
+
 from assignment4.helpers import train_test_split, mean, standard_deviation
 from assignment4.dataset import Dataset
 from assignment4.general_perceptron import GeneralPerceptron
@@ -13,6 +15,56 @@ try:
     plotting_available = True
 except ModuleNotFoundError:
     plotting_available = False
+
+
+def select_hyper_parameters(dataset, activation_function, k=5):
+    random.shuffle(dataset)
+    fold_size = int(len(dataset) / k)
+
+    epochs = [25, 50, 100, 200, 300, 400, 500, 600, 750, 1000]
+    learning_rates = [0.1, 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001]
+    results = list()
+
+    for epoch in epochs:
+        for learning_rate in learning_rates:
+            realizations = list()
+            for i in range(k):
+                test_start = i * fold_size
+                test_end = (i + 1) * fold_size
+
+                # Make training and test sets
+                training_set = list()
+                test_set = list()
+                for j in range(len(dataset)):
+                    if j < test_start or j >= test_end:
+                        training_set.append(dataset[j].copy())
+                    else:
+                        test_set.append(dataset[j].copy())
+
+                model = GeneralPerceptron(activation_function, learning_rate=learning_rate, epochs=epoch)
+                model.train(training_set)
+
+                d = list()
+                y = list()
+
+                # Validate the model
+                for row in test_set:
+                    d.append(row[-1])
+                    y.append(model.predict(row[:-1]))
+
+                realization = Realization(training_set, test_set, None, Scores(d, y), None)
+                realizations.append(realization)
+
+            accuracies = list(map(lambda r: r.scores.accuracy, realizations))
+            mean_accuracy = mean(accuracies)
+            print("Epochs: {}     Learning rate: {}     Accuracy: {:.2f}%".format(epoch, learning_rate, mean_accuracy * 100))
+
+            results.append((epoch, learning_rate, mean_accuracy))
+
+    results = sorted(results, key=lambda r: r[2], reverse=True)
+    best_hyper_parameters = results[0]
+    print("\n\n>>> Best hyper parameters:")
+    print("Epochs: {}     Learning rate: {}     Accuracy: {:.2f}%".format(best_hyper_parameters[0], best_hyper_parameters[1], best_hyper_parameters[2] * 100))
 
 
 def evaluate(model, dataset, ratio=0.8, num_realizations=20):
@@ -79,7 +131,7 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
 # generate_artificial_dataset()
 
 # Artificial
-dataset = Dataset("assignment4/datasets/artificial.csv")
+# dataset = Dataset("assignment4/datasets/artificial.csv")
 
 # Setosa vs outras
 # dataset = Dataset("assignment4/datasets/iris.csv", encoding={'Iris-setosa': 0})
@@ -88,22 +140,24 @@ dataset = Dataset("assignment4/datasets/artificial.csv")
 # dataset = Dataset("assignment4/datasets/iris.csv", encoding={'Iris-versicolor': 0})
 
 # Virginica vs outras
-# dataset = Dataset("assignment4/datasets/iris.csv", encoding={'Iris-virginica': 0})
+dataset = Dataset("assignment4/datasets/iris.csv", encoding={'Iris-virginica': 0})
 
 # activation_function = LinearActivationFunction()
 # activation_function = LogisticActivationFunction()
 activation_function = HyperbolicTangentActivationFunction()
 
-learning_rate = 0.01
-epochs = 300
-split_ratio = 0.8
-num_realizations = 20
+# learning_rate = 0.01
+# epochs = 300
+# split_ratio = 0.8
+# num_realizations = 20
 
-model = GeneralPerceptron(activation_function,
-                          learning_rate=learning_rate,
-                          epochs=epochs,
-                          early_stopping=True,
-                          verbose=False)
-evaluate(model, dataset.load(), ratio=split_ratio, num_realizations=num_realizations)
+# model = GeneralPerceptron(activation_function,
+#                           learning_rate=learning_rate,
+#                           epochs=epochs,
+#                           early_stopping=True,
+#                           verbose=False)
+# evaluate(model, dataset.load(), ratio=split_ratio, num_realizations=num_realizations)
+
+select_hyper_parameters(dataset.load(), activation_function)
 
 print("Done!")

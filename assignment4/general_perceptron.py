@@ -1,5 +1,5 @@
 import random
-from assignment4.helpers import vector_sum, vector_scalar_product, matrix_product, step
+from assignment4.helpers import vector_sum, vector_scalar_product, matrix_product
 
 
 class GeneralPerceptron:
