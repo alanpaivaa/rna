@@ -4,7 +4,7 @@ from assignment4.general_perceptron import GeneralPerceptron
 from assignment4.realization import Realization
 from assignment4.scores import Scores
 from assignment4.normalizer import Normalizer
-from assignment4.activation_functions import LinearActivationFunction, SigmoidLogisticActivationFunction
+from assignment4.activation_functions import LogisticActivationFunction, HyperbolicTangentActivationFunction
 
 # Import plotting modules, if they're available
 try:
@@ -80,8 +80,8 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
 
 dataset = Dataset("assignment4/datasets/artificial.csv")
 
-# activation_function = LinearActivationFunction()
-activation_function = SigmoidLogisticActivationFunction()
+# activation_function = LogisticActivationFunction()
+activation_function = HyperbolicTangentActivationFunction()
 
 learning_rate = 0.01
 epochs = 300

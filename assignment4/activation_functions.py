@@ -2,7 +2,7 @@ import math
 from assignment4.helpers import step
 
 
-class SigmoidLogisticActivationFunction:
+class LogisticActivationFunction:
     @staticmethod
     def transform_class(value):
         if int(value) == 1:
@@ -20,3 +20,23 @@ class SigmoidLogisticActivationFunction:
     @staticmethod
     def step(u):
         return step(u, threshold=0.5)
+
+
+class HyperbolicTangentActivationFunction:
+    @staticmethod
+    def transform_class(d):
+        if int(d) == 1:
+            return 0.99
+        return -0.99
+
+    @staticmethod
+    def derivative(y):
+        return 0.5 * (1 - y ** 2)
+
+    @staticmethod
+    def activate(u):
+        return (1 - math.exp(-u)) / (1 + math.exp(-u))
+
+    @staticmethod
+    def step(u):
+        return step(u, threshold=0)
