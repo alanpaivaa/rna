@@ -2,12 +2,38 @@ import math
 from assignment4.helpers import step
 
 
+class LinearActivationFunction:
+    @staticmethod
+    def transform_d(d):
+        return d
+
+    @staticmethod
+    def transform_y(y):
+        return step(y)
+
+    @staticmethod
+    def derivative(value):
+        return 1
+
+    @staticmethod
+    def activate(u):
+        return u
+
+    @staticmethod
+    def step(u):
+        return step(u)
+
+
 class LogisticActivationFunction:
     @staticmethod
-    def transform_class(value):
-        if int(value) == 1:
+    def transform_d(d):
+        if int(d) == 1:
             return 0.99
-        return value
+        return d
+
+    @staticmethod
+    def transform_y(y):
+        return y
 
     @staticmethod
     def derivative(value):
@@ -24,10 +50,14 @@ class LogisticActivationFunction:
 
 class HyperbolicTangentActivationFunction:
     @staticmethod
-    def transform_class(d):
+    def transform_d(d):
         if int(d) == 1:
             return 0.99
         return -0.99
+
+    @staticmethod
+    def transform_y(y):
+        return y
 
     @staticmethod
     def derivative(y):
@@ -39,4 +69,4 @@ class HyperbolicTangentActivationFunction:
 
     @staticmethod
     def step(u):
-        return step(u, threshold=0)
+        return step(u)

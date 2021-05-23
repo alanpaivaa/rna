@@ -13,7 +13,7 @@ class GeneralPerceptron:
         self.errors = None
 
     def criterion(self, d, y):
-        return self.activation_function.transform_class(d) - y
+        return self.activation_function.transform_d(d) - self.activation_function.transform_y(y)
 
     @staticmethod
     def biased_row(row):

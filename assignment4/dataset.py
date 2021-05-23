@@ -1,9 +1,10 @@
 from assignment4.helpers import load_dataset
 
+
 class Dataset:
-    def __init__(self, filename):
+    def __init__(self, filename, encoding=None):
         self.filename = filename
-        self.encoding = None
+        self.encoding = encoding
 
     def generate_encoding(self, dataset):
         if type(dataset[0][-1]) != str:
@@ -35,7 +36,9 @@ class Dataset:
     def load(self):
         dataset = load_dataset(self.filename)
 
-        self.generate_encoding(dataset)
+        if self.encoding is None:
+            self.generate_encoding(dataset)
+
         if self.encoding is not None:
             dataset = self.encoded_classes(dataset)
         self.set_last_column_int(dataset)

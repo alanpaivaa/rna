@@ -4,7 +4,7 @@ from assignment4.general_perceptron import GeneralPerceptron
 from assignment4.realization import Realization
 from assignment4.scores import Scores
 from assignment4.normalizer import Normalizer
-from assignment4.activation_functions import LogisticActivationFunction, HyperbolicTangentActivationFunction
+from assignment4.activation_functions import LinearActivationFunction, LogisticActivationFunction, HyperbolicTangentActivationFunction
 
 # Import plotting modules, if they're available
 try:
@@ -78,8 +78,19 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
 # Generate artificial dataset
 # generate_artificial_dataset()
 
+# Artificial
 dataset = Dataset("assignment4/datasets/artificial.csv")
 
+# Setosa vs outras
+# dataset = Dataset("assignment4/datasets/iris.csv", encoding={'Iris-setosa': 0})
+
+# Versicolor vs outras
+# dataset = Dataset("assignment4/datasets/iris.csv", encoding={'Iris-versicolor': 0})
+
+# Virginica vs outras
+# dataset = Dataset("assignment4/datasets/iris.csv", encoding={'Iris-virginica': 0})
+
+# activation_function = LinearActivationFunction()
 # activation_function = LogisticActivationFunction()
 activation_function = HyperbolicTangentActivationFunction()
 
