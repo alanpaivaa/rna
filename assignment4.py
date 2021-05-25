@@ -127,37 +127,52 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
                               ylabel="X2")
 
 
-# Generate artificial dataset
-# generate_artificial_dataset()
+# select_hyper_parameters(dataset.load(), activation_function)
 
+# Dataset descriptors (lazy loaded)
 # Artificial
-# dataset = Dataset("assignment4/datasets/artificial.csv")
+artificial_dataset = Dataset("assignment4/datasets/artificial.csv")
 
-# Setosa vs outras
-# dataset = Dataset("assignment4/datasets/iris.csv", encoding={'Iris-setosa': 0})
+# Setosa vs others
+setosa_dataset = Dataset("assignment4/datasets/iris.csv", encoding={'Iris-setosa': 0})
 
-# Versicolor vs outras
-# dataset = Dataset("assignment4/datasets/iris.csv", encoding={'Iris-versicolor': 0})
+# Versicolor vs others
+versicolor_dataset = Dataset("assignment4/datasets/iris.csv", encoding={'Iris-versicolor': 0})
 
-# Virginica vs outras
-dataset = Dataset("assignment4/datasets/iris.csv", encoding={'Iris-virginica': 0})
+# Virginica vs others
+virginica_dataset = Dataset("assignment4/datasets/iris.csv", encoding={'Iris-virginica': 0})
 
-# activation_function = LinearActivationFunction()
-# activation_function = LogisticActivationFunction()
-activation_function = HyperbolicTangentActivationFunction()
+# Activation functions
+linear_activation_function = LinearActivationFunction()
+logistic_activation_function = LogisticActivationFunction()
+tanh_activation_function = HyperbolicTangentActivationFunction()
 
-# learning_rate = 0.01
-# epochs = 300
-# split_ratio = 0.8
-# num_realizations = 20
+# Best hyper parameter found using grid search with k-fold cross validation
+hyper_parameters = {
+    ('artificial', 'linear'): (artificial_dataset, linear_activation_function, 25, 0.01),
+    ('artificial', 'logistic'): (artificial_dataset, logistic_activation_function, 25, 0.1),
+    ('artificial', 'tanh'): (artificial_dataset, tanh_activation_function, 25, 0.1),
+    ('setosa', 'linear'): (setosa_dataset, linear_activation_function, 25, 0.1),
+    ('setosa', 'logistic'): (setosa_dataset, logistic_activation_function, 50, 0.1),
+    ('setosa', 'tanh'): (setosa_dataset, tanh_activation_function, 25, 0.1),
+    ('versicolor', 'linear'): (versicolor_dataset, linear_activation_function, 100, 0.05),
+    ('versicolor', 'logistic'): (versicolor_dataset, logistic_activation_function, 500, 0.1),
+    ('versicolor', 'tanh'): (versicolor_dataset, tanh_activation_function, 300, 0.1),
+    ('virginica', 'linear'): (virginica_dataset, linear_activation_function, 500, 0.1),
+    ('virginica', 'logistic'): (virginica_dataset, logistic_activation_function, 600, 0.1),
+    ('virginica', 'tanh'): (virginica_dataset, tanh_activation_function, 200, 0.05),
+}
 
-# model = GeneralPerceptron(activation_function,
-#                           learning_rate=learning_rate,
-#                           epochs=epochs,
-#                           early_stopping=True,
-#                           verbose=False)
-# evaluate(model, dataset.load(), ratio=split_ratio, num_realizations=num_realizations)
+dataset, activation_function, epochs, learning_rate = hyper_parameters[('virginica', 'tanh')]
 
-select_hyper_parameters(dataset.load(), activation_function)
+split_ratio = 0.8
+num_realizations = 20
+
+model = GeneralPerceptron(activation_function,
+                          learning_rate=learning_rate,
+                          epochs=epochs,
+                          early_stopping=True,
+                          verbose=False)
+evaluate(model, dataset.load(), ratio=split_ratio, num_realizations=num_realizations)
 
 print("Done!")
