@@ -58,37 +58,38 @@ class GeneralPerceptronNetwork:
         assert shape(self.weights) == (self.p, self.c)  # Shape: (p, c)
 
     def train_predict(self, row):
-        u_t = matrix_product([row], self.weights)[0]
+        u_t = matrix_product([row], self.weights)[0]  # Shape: (1, c)
         y_t = [self.activation_function.activate(u) for u in u_t]
-
-        # count = 0
-        # for y in y_values:
-        #     count += y
-        #
-        # # Not in "doubt" area
-        # if count != 1:
-        #     i_max = 0
-        #     for i in range(len(u_values)):
-        #         if u_values[i] > u_values[i_max]:
-        #             i_max = i
-        #     for i in range(len(u_values)):
-        #         if i == i_max:
-        #             y_values[i] = 1
-        #         else:
-        #             y_values[i] = 0
-
         return y_t
 
     def predict(self, row):
-        y_values = self.predict_one_hot(row + [-1])
-        for i in range(len(y_values)):
-            if y_values[i] == 1:
+        u_t = self.train_predict(row + [-1])
+        y_t = [self.activation_function.step(prob) for prob in u_t]
+
+        count = 0
+        for y in y_t:
+            count += y
+
+        # In "doubt" area
+        if count != 1:
+            i_max = 0
+            for i in range(len(u_t)):
+                if u_t[i] > u_t[i_max]:
+                    i_max = i
+            for i in range(len(u_t)):
+                if i == i_max:
+                    y_t[i] = 1
+                else:
+                    y_t[i] = 0
+
+        for i in range(len(y_t)):
+            if y_t[i] == 1:
                 return i
         assert False, "Bad one hot encoding"
 
     def optimize_weights(self, x_t, d_t, y_t):
         e_t = matrix_sub(d_t, y_t)
-        y_t_derivative = self.activation_function.derivative(y_t)
+        y_t_derivative = [[self.activation_function.derivative(x) for x in row] for row in y_t]
         ey = matrix_elementwise_product(e_t, y_t_derivative)  # Shape: (1, c)
 
         x = matrix_t(x_t)  # Shape: (p, 1)
@@ -119,6 +120,9 @@ class GeneralPerceptronNetwork:
 
                 # Get desired output
                 d_t = [row[-self.c:]]                 # Shape: (1, c)
+
+                # Avoid numerical issues by using values close to 1
+                d_t = [[self.activation_function.transform_d(d) for d in row] for row in d_t]
 
                 # Make prediction in one hot format
                 y_t = [self.train_predict(x_t[0])]  # Shape: (1, c)
