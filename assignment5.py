@@ -131,22 +131,28 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
 # Artificial
 artificial_dataset = Dataset("assignment5/datasets/artificial.csv")
 
+# Iris
+iris_dataset = Dataset("assignment5/datasets/iris.csv")
+
 # Activation functions
 linear_activation_function = LinearActivationFunction()
 logistic_activation_function = LogisticActivationFunction()
 tanh_activation_function = HyperbolicTangentActivationFunction()
 
 # Select best hyper parameters
-# select_hyper_parameters(artificial_dataset.load(), tanh_activation_function)
+# select_hyper_parameters(iris_dataset.load(), tanh_activation_function)
 
 # Best hyper parameter found using grid search with k-fold cross validation
 hyper_parameters = {
     ('artificial', 'linear'): (artificial_dataset, linear_activation_function, 100, 0.1),
     ('artificial', 'logistic'): (artificial_dataset, logistic_activation_function, 100, 0.1),
     ('artificial', 'tanh'): (artificial_dataset, tanh_activation_function, 300, 0.01),
+    ('iris', 'linear'): (iris_dataset, linear_activation_function, 100, 0.1),
+    ('iris', 'logistic'): (iris_dataset, logistic_activation_function, 100, 0.1),
+    ('iris', 'tanh'): (iris_dataset, tanh_activation_function, 750, 0.01),
 }
 
-dataset, activation_function, epochs, learning_rate = hyper_parameters[('artificial', 'tanh')]
+dataset, activation_function, epochs, learning_rate = hyper_parameters[('iris', 'tanh')]
 
 split_ratio = 0.8
 num_realizations = 20
