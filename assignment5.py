@@ -140,19 +140,19 @@ logistic_activation_function = LogisticActivationFunction()
 tanh_activation_function = HyperbolicTangentActivationFunction()
 
 # Select best hyper parameters
-# select_hyper_parameters(iris_dataset.load(), tanh_activation_function)
+# select_hyper_parameters(iris_dataset.load(), linear_activation_function)
 
 # Best hyper parameter found using grid search with k-fold cross validation
 hyper_parameters = {
-    ('artificial', 'linear'): (artificial_dataset, linear_activation_function, 100, 0.1),
-    ('artificial', 'logistic'): (artificial_dataset, logistic_activation_function, 100, 0.1),
-    ('artificial', 'tanh'): (artificial_dataset, tanh_activation_function, 300, 0.01),
-    ('iris', 'linear'): (iris_dataset, linear_activation_function, 100, 0.1),
-    ('iris', 'logistic'): (iris_dataset, logistic_activation_function, 100, 0.1),
-    ('iris', 'tanh'): (iris_dataset, tanh_activation_function, 750, 0.01),
+    ('artificial', 'linear'): (artificial_dataset, linear_activation_function, 300, 0.001),
+    ('artificial', 'logistic'): (artificial_dataset, logistic_activation_function, 200, 0.05),
+    ('artificial', 'tanh'): (artificial_dataset, tanh_activation_function, 300, 0.005),
+    ('iris', 'linear'): (iris_dataset, linear_activation_function, 1000, 0.005),
+    ('iris', 'logistic'): (iris_dataset, logistic_activation_function, 400, 0.01),
+    ('iris', 'tanh'): (iris_dataset, tanh_activation_function, 300, 0.005),
 }
 
-dataset, activation_function, epochs, learning_rate = hyper_parameters[('artificial', 'tanh')]
+dataset, activation_function, epochs, learning_rate = hyper_parameters[('iris', 'tanh')]
 
 split_ratio = 0.8
 num_realizations = 20

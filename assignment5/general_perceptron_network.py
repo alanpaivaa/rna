@@ -130,7 +130,10 @@ class GeneralPerceptronNetwork:
                 # Update error summation
                 errors = matrix_sub(d_t, y_t)
                 for error in errors[0]:
-                    error_sum += error ** 2
+                    try:
+                        error_sum += error ** 2
+                    except OverflowError:
+                        error_sum = float('inf')
 
                 # Update weights
                 self.optimize_weights(x_t, d_t, y_t)
