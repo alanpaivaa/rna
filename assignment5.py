@@ -152,7 +152,7 @@ hyper_parameters = {
     ('iris', 'tanh'): (iris_dataset, tanh_activation_function, 750, 0.01),
 }
 
-dataset, activation_function, epochs, learning_rate = hyper_parameters[('iris', 'tanh')]
+dataset, activation_function, epochs, learning_rate = hyper_parameters[('artificial', 'tanh')]
 
 split_ratio = 0.8
 num_realizations = 20

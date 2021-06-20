@@ -12,11 +12,12 @@ def plot_decision_surface(model, dataset, title=None, xlabel=None, ylabel=None, 
 
     classes = np.unique(predictions)
     colors = ["cornflowerblue", "forestgreen", "salmon"]
+    markers = ["o", "*", "^"]
     for c in classes:
         points = grid[predictions == c]
-        plt.scatter(points[:, 0], points[:, 1], color=colors[c], alpha=0.05)
+        plt.scatter(points[:, 0], points[:, 1], marker="s", color=colors[c], alpha=0.05)
         set_points = np_dataset[np_dataset[:, -1] == c]
-        plt.scatter(set_points[:, 0], set_points[:, 1], color=colors[c])
+        plt.scatter(set_points[:, 0], set_points[:, 1], color=colors[c], marker=markers[c])
 
     plt.margins(x=0, y=0)
 
