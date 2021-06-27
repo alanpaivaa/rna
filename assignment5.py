@@ -21,8 +21,8 @@ def select_hyper_parameters(dataset, activation_function, k=5):
     random.shuffle(dataset)
     fold_size = int(len(dataset) / k)
 
-    epochs = [25, 50, 100, 200, 300, 400, 500, 600, 750, 1000]
-    learning_rates = [0.1, 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001]
+    epochs = [25, 50, 100, 200, 300, 400, 500]
+    learning_rates = [0.1, 0.05, 0.01, 0.005, 0.001]
     results = list()
 
     for epoch in epochs:
@@ -147,34 +147,34 @@ tanh_activation_function = HyperbolicTangentActivationFunction()
 
 # Best hyper parameter found using grid search with k-fold cross validation
 hyper_parameters = {
-    ('artificial', 'linear'): (artificial_dataset, linear_activation_function, 300, 0.001),
+    ('artificial', 'linear'): (artificial_dataset, linear_activation_function, 25, 0.01),
     ('artificial', 'logistic'): (artificial_dataset, logistic_activation_function, 200, 0.05),
-    ('artificial', 'tanh'): (artificial_dataset, tanh_activation_function, 300, 0.005),
-    ('iris', 'linear'): (iris_dataset, linear_activation_function, 1000, 0.005),
-    ('iris', 'logistic'): (iris_dataset, logistic_activation_function, 400, 0.01),
-    ('iris', 'tanh'): (iris_dataset, tanh_activation_function, 300, 0.005),
-    ('iris01', 'linear'): (iris01_dataset, linear_activation_function, 600, 0.001),     # 75.33%
-    ('iris01', 'logistic'): (iris01_dataset, logistic_activation_function, 400, 0.05),  # 77.33%
-    ('iris01', 'tanh'): (iris01_dataset, tanh_activation_function, 600, 0.005),         # 79.33%
-    ('iris02', 'linear'): (iris02_dataset, linear_activation_function, 600, 0.001),     # 84.00%
-    ('iris02', 'logistic'): (iris02_dataset, logistic_activation_function, 750, 0.05),  # 96.00%
-    ('iris02', 'tanh'): (iris02_dataset, tanh_activation_function, 300, 0.05),          # 96.67%
-    ('iris03', 'linear'): (iris03_dataset, linear_activation_function, 1000, 0.005),    # 82.00%
-    ('iris03', 'logistic'): (iris03_dataset, logistic_activation_function, 400, 0.05),  # 94.00%
-    ('iris03', 'tanh'): (iris03_dataset, tanh_activation_function, 750, 0.05),          # 97.33%
-    ('iris12', 'linear'): (iris12_dataset, linear_activation_function, 750, 0.005),      # 82.00%
-    ('iris12', 'logistic'): (iris12_dataset, logistic_activation_function, 1000, 0.05),  # 96.67%
-    ('iris12', 'tanh'): (iris12_dataset, tanh_activation_function, 750, 0.01),           # 94.67%
-    ('iris13', 'linear'): (iris13_dataset, linear_activation_function, 200, 0.01),     # 85.33%
-    ('iris13', 'logistic'): (iris13_dataset, logistic_activation_function, 400, 0.1),  # 96.67%
-    ('iris13', 'tanh'): (iris13_dataset, tanh_activation_function, 200, 0.05),         # 95.33%
-    ('iris23', 'linear'): (iris23_dataset, linear_activation_function, 500, 0.01),      # 82.22%
-    ('iris23', 'logistic'): (iris23_dataset, logistic_activation_function, 400, 0.05),  # 92.67%
-    ('iris23', 'tanh'): (iris23_dataset, tanh_activation_function, 500, 0.01),          # 91.33%
+    ('artificial', 'tanh'): (artificial_dataset, tanh_activation_function, 200, 0.01),
+    ('iris', 'linear'): (iris_dataset, linear_activation_function, 100, 0.1),
+    ('iris', 'logistic'): (iris_dataset, logistic_activation_function, 750, 0.01),
+    ('iris', 'tanh'): (iris_dataset, tanh_activation_function, 500, 0.01),
+    ('iris01', 'linear'): (iris01_dataset, linear_activation_function, 600, 0.001),
+    ('iris01', 'logistic'): (iris01_dataset, logistic_activation_function, 400, 0.05),
+    ('iris01', 'tanh'): (iris01_dataset, tanh_activation_function, 600, 0.005),
+    ('iris02', 'linear'): (iris02_dataset, linear_activation_function, 600, 0.001),
+    ('iris02', 'logistic'): (iris02_dataset, logistic_activation_function, 750, 0.05),
+    ('iris02', 'tanh'): (iris02_dataset, tanh_activation_function, 300, 0.05),
+    ('iris03', 'linear'): (iris03_dataset, linear_activation_function, 1000, 0.005),
+    ('iris03', 'logistic'): (iris03_dataset, logistic_activation_function, 400, 0.05),
+    ('iris03', 'tanh'): (iris03_dataset, tanh_activation_function, 750, 0.05),
+    ('iris12', 'linear'): (iris12_dataset, linear_activation_function, 750, 0.005),
+    ('iris12', 'logistic'): (iris12_dataset, logistic_activation_function, 1000, 0.05),
+    ('iris12', 'tanh'): (iris12_dataset, tanh_activation_function, 750, 0.01),
+    ('iris13', 'linear'): (iris13_dataset, linear_activation_function, 200, 0.01),
+    ('iris13', 'logistic'): (iris13_dataset, logistic_activation_function, 400, 0.1),
+    ('iris13', 'tanh'): (iris13_dataset, tanh_activation_function, 200, 0.05),
+    ('iris23', 'linear'): (iris23_dataset, linear_activation_function, 500, 0.01),
+    ('iris23', 'logistic'): (iris23_dataset, logistic_activation_function, 400, 0.05),
+    ('iris23', 'tanh'): (iris23_dataset, tanh_activation_function, 500, 0.01),
 }
 
 # Select best hyper parameters
-# select_hyper_parameters(iris13_dataset.load(), linear_activation_function)
+# select_hyper_parameters(iris_dataset.load(), tanh_activation_function)
 # ds = ['iris01', 'iris02', 'iris03', 'iris12', 'iris13', 'iris23']
 # fs = ['linear', 'logistic', 'tanh']
 # pairs = [(d, f) for d in ds for f in fs]
@@ -184,7 +184,7 @@ hyper_parameters = {
 #     select_hyper_parameters(dataset.load(), activation_function)
 #     print("\n\n\n\n\n")
 
-dataset, activation_function, epochs, learning_rate = hyper_parameters[('artificial', 'tanh')]
+dataset, activation_function, epochs, learning_rate = hyper_parameters[('iris', 'tanh')]
 
 split_ratio = 0.8
 num_realizations = 20

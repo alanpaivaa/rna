@@ -23,6 +23,10 @@ class LinearActivationFunction:
     def step(u):
         return step(u)
 
+    @staticmethod
+    def step_train():
+        return True
+
 
 class LogisticActivationFunction:
     @staticmethod
@@ -47,6 +51,10 @@ class LogisticActivationFunction:
     def step(u):
         return step(u, threshold=0.5)
 
+    @staticmethod
+    def step_train():
+        return False
+
 
 class HyperbolicTangentActivationFunction:
     @staticmethod
@@ -70,3 +78,7 @@ class HyperbolicTangentActivationFunction:
     @staticmethod
     def step(u):
         return step(u)
+
+    @staticmethod
+    def step_train():
+        return False

@@ -60,11 +60,25 @@ class GeneralPerceptronNetwork:
     def train_predict(self, row):
         u_t = matrix_product([row], self.weights)[0]  # Shape: (1, c)
         y_t = [self.activation_function.activate(u) for u in u_t]
+
+        # Some activation functions don't have clear boundaries [0, 1], so we need the step function
+        if self.activation_function.step_train():
+            y_t = self.step_predict(u_t, y_t)
+
         return y_t
 
     def predict(self, row):
-        u_t = self.train_predict(row + [-1])
-        y_t = [self.activation_function.step(prob) for prob in u_t]
+        u_t = matrix_product([row + [-1]], self.weights)[0]  # Shape: (1, c)
+        y_t = [self.activation_function.activate(u) for u in u_t]
+        y_t = self.step_predict(u_t, y_t)
+
+        for i in range(len(y_t)):
+            if y_t[i] == 1:
+                return i
+        assert False, "Bad one hot encoding"
+
+    def step_predict(self, u_t, y):
+        y_t = [self.activation_function.step(prob) for prob in y]
 
         count = 0
         for y in y_t:
@@ -82,10 +96,7 @@ class GeneralPerceptronNetwork:
                 else:
                     y_t[i] = 0
 
-        for i in range(len(y_t)):
-            if y_t[i] == 1:
-                return i
-        assert False, "Bad one hot encoding"
+        return y_t
 
     def optimize_weights(self, x_t, d_t, y_t):
         e_t = matrix_sub(d_t, y_t)
