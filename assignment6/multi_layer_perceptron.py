@@ -110,14 +110,3 @@ class MultiLayerPerceptron:
             if self.early_stopping and error_sum == 0:
                 self.log("Early stopping training in epoch {} as no mistakes were made".format(epoch))
                 break
-
-
-model = MultiLayerPerceptron(num_hidden=2, verbose=True)
-training_set = [
-    [1, 2, 3, 0],
-    [4, 5, 6, 1],
-    [7, 8, 9, 0],
-]
-
-model.train(training_set)
-print("Done!")
