@@ -10,12 +10,17 @@ class MultiLayerPerceptron:
         self.epochs = epochs
         self.early_stopping = early_stopping
         self.verbose = verbose
-        self.num_hidden = num_hidden
+        self.num_hidden = num_hidden + 1  # 1 for bias
         self.num_inputs = None
         self.num_classes = None
         self.one_hot_encodings = None
         self.layers = None
         self.one_hot_encodings = None
+        self.errors = None
+
+    def log(self, *args, **kwargs):
+        if self.verbose:
+            print(*args, **kwargs)
 
     def generate_one_hot_encodings(self, dataset):
         max_class = -1
@@ -47,8 +52,8 @@ class MultiLayerPerceptron:
     # TODO: Make layer creation more generic and parameterized
     def initialize_layers(self):
         self.layers = list()
-        self.layers.append(Layer(activation_function=HyperbolicTangentActivationFunction(), num_inputs=self.num_inputs, num_neurons=self.num_hidden))
-        self.layers.append(Layer(activation_function=LinearActivationFunction(), num_inputs=self.num_hidden, num_neurons=self.num_classes))
+        self.layers.append(Layer(activation_function=HyperbolicTangentActivationFunction(), num_inputs=self.num_inputs, num_neurons=self.num_hidden, learning_rate=self.learning_rate))
+        self.layers.append(Layer(activation_function=LinearActivationFunction(), num_inputs=self.num_hidden, num_neurons=self.num_classes, learning_rate=self.learning_rate))
 
     def forward(self, row):
         # Get the features with bias
@@ -59,6 +64,18 @@ class MultiLayerPerceptron:
             layer.forward(x_t)
             x_t = layer.output
 
+    def backward(self, row):
+        x_t = [row[:-self.num_classes] + [-1]]  # Shape: (1, num_inputs)
+        d_t = [row[-self.num_classes:]]         # Shape: (1, num_classes)
+
+        # Update last layer's weights
+        self.layers[-1].backward(self.layers[-2].output, d_t)
+
+        i = len(self.layers) - 2
+        while i >= 0:
+            self.layers[i].backward_hidden(x_t, self.layers[i + 1])
+            i -= 1
+
     def train(self, training_set):
         assert len(training_set) > 0
         assert len(training_set[0]) > 0
@@ -68,6 +85,7 @@ class MultiLayerPerceptron:
         self.num_inputs = len(one_hot_training_set[0]) - self.num_classes + 1  # 1 for bias
 
         self.initialize_layers()
+        self.errors = list()
 
         for epoch in range(self.epochs):
             error_sum = 0
@@ -75,34 +93,30 @@ class MultiLayerPerceptron:
 
             for row in one_hot_training_set:
                 self.forward(row)
+                self.backward(row)
 
-                # Get desired output
-                # d_t = [row[-self.num_classes:]]  # Shape: (1, num_classes)
-                # assert shape(d_t) == (1, self.num_classes)
-                #
-                # Avoid numerical issues by using values close to 1
-                # d_t = [[self.activation_function.transform_d(d) for d in row] for row in d_t]
-                #
-                # # Make prediction in one hot format
-                # y_t = [self.train_predict(x_t[0])]  # Shape: (1, c)
-                #
-                # # Update error summation
-                # errors = matrix_sub(d_t, y_t)
-                # for error in errors[0]:
-                #     try:
-                #         error_sum += error ** 2
-                #     except OverflowError:
-                #         error_sum = float('inf')
-                #
-                # # Update weights
-                # self.optimize_weights(x_t, d_t, y_t)
+                # Update error summation
+                for layer in self.layers:
+                    for error in layer.errors[0]:
+                        try:
+                            error_sum += error ** 2
+                        except OverflowError:
+                            error_sum = float('inf')
+
+            self.log("epoch {}, error: {:.2f}".format(epoch, error_sum))
+            self.errors.append(error_sum)
+
+            # No errors in the epoch, no need to continue training
+            if self.early_stopping and error_sum == 0:
+                self.log("Early stopping training in epoch {} as no mistakes were made".format(epoch))
+                break
 
 
-model = MultiLayerPerceptron(num_hidden=2)
+model = MultiLayerPerceptron(num_hidden=2, verbose=True)
 training_set = [
     [1, 2, 3, 0],
     [4, 5, 6, 1],
-    [7, 8, 9, 2],
+    [7, 8, 9, 0],
 ]
 
 model.train(training_set)
