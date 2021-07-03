@@ -160,7 +160,7 @@ hyper_parameters = {
 #     select_hyper_parameters(dataset.load(), activation_function)
 #     print("\n\n\n\n\n")
 
-dataset, activation_function, epochs, learning_rate = hyper_parameters[('iris', 'linear')]
+dataset, activation_function, epochs, learning_rate = hyper_parameters[('artificial', 'linear')]
 
 split_ratio = 0.8
 num_realizations = 1
@@ -168,8 +168,8 @@ num_realizations = 1
 model = MultiLayerPerceptron(num_hidden=5,
                              learning_rate=learning_rate,
                              epochs=epochs,
-                             early_stopping=False,
-                             verbose=False)
+                             early_stopping=True,
+                             verbose=True)
 evaluate(model, dataset.load(), ratio=split_ratio, num_realizations=num_realizations)
 
 print("Done!")
