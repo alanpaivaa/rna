@@ -52,8 +52,28 @@ class MultiLayerPerceptron:
     # TODO: Make layer creation more generic and parameterized
     def initialize_layers(self):
         self.layers = list()
-        self.layers.append(Layer(activation_function=HyperbolicTangentActivationFunction(), num_inputs=self.num_inputs, num_neurons=self.num_hidden, learning_rate=self.learning_rate))
-        self.layers.append(Layer(activation_function=LinearActivationFunction(), num_inputs=self.num_hidden, num_neurons=self.num_classes, learning_rate=self.learning_rate))
+        self.layers.append(Layer(activation_function=HyperbolicTangentActivationFunction(),
+                                 num_inputs=self.num_inputs,
+                                 num_neurons=self.num_hidden,
+                                 learning_rate=self.learning_rate))
+        self.layers.append(Layer(activation_function=LinearActivationFunction(),
+                                 num_inputs=self.num_hidden,
+                                 num_neurons=self.num_classes,
+                                 learning_rate=self.learning_rate))
+
+    def predict(self, row):
+        y_t = [row + [-1]]  # Shape: (1, num_inputs)
+        assert shape(y_t) == (1, self.num_inputs)
+
+        for i in range(len(self.layers)):
+            step_result = i == len(self.layers) - 1
+            y_t = self.layers[i].forward(y_t, training=False, step=step_result)
+
+        for i in range(len(y_t[0])):
+            if y_t[0][i] != 0:
+                return i
+
+        assert False, "Wrong result"
 
     def forward(self, row):
         # Get the features with bias
@@ -61,19 +81,28 @@ class MultiLayerPerceptron:
         assert shape(x_t) == (1, self.num_inputs)
 
         for layer in self.layers:
-            layer.forward(x_t)
+            layer.forward(x_t, training=True)
             x_t = layer.output
 
     def backward(self, row):
-        x_t = [row[:-self.num_classes] + [-1]]  # Shape: (1, num_inputs)
         d_t = [row[-self.num_classes:]]         # Shape: (1, num_classes)
 
         # Update last layer's weights
-        self.layers[-1].backward(self.layers[-2].output, d_t)
+        self.layers[-1].update_errors(d_t)
 
         i = len(self.layers) - 2
         while i >= 0:
-            self.layers[i].backward_hidden(x_t, self.layers[i + 1])
+            self.layers[i].update_errors_hidden(self.layers[i + 1])
+            i -= 1
+
+        i = len(self.layers) - 1
+        while i >= 0:
+            if i > 0:
+                x_t = self.layers[i - 1].output
+            else:
+                x_t = [row[:-self.num_classes] + [-1]]
+
+            self.layers[i].backward(x_t)
             i -= 1
 
     def train(self, training_set):
