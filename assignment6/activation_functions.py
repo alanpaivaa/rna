@@ -33,7 +33,7 @@ class LogisticActivationFunction:
     def transform_d(d):
         if int(d) == 1:
             return 0.99
-        return d
+        return 0.01
 
     @staticmethod
     def transform_y(y):

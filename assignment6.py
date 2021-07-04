@@ -71,7 +71,6 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
     normalizer = Normalizer()
     normalizer.fit(dataset)
     normalized_dataset = [normalizer.normalize(row[:-1]) + [row[-1]] for row in dataset]
-    # normalized_dataset = dataset
 
     realizations = list()
 
@@ -141,10 +140,10 @@ tanh_activation_function = HyperbolicTangentActivationFunction()
 
 # Best hyper parameter found using grid search with k-fold cross validation
 hyper_parameters = {
-    ('artificial', 'linear'): (artificial_dataset, linear_activation_function, 100, 0.1),
+    ('artificial', 'linear'): (artificial_dataset, linear_activation_function, 500, 0.3),
     # ('artificial', 'logistic'): (artificial_dataset, logistic_activation_function, 200, 0.05),
     # ('artificial', 'tanh'): (artificial_dataset, tanh_activation_function, 200, 0.01),
-    ('iris', 'linear'): (iris_dataset, linear_activation_function, 100, 0.1),
+    ('iris', 'linear'): (iris_dataset, linear_activation_function, 500, 0.03),
     # ('iris', 'logistic'): (iris_dataset, logistic_activation_function, 100, 0.1),
     # ('iris', 'tanh'): (iris_dataset, tanh_activation_function, 100, 0.1),
 }
@@ -165,7 +164,7 @@ dataset, activation_function, epochs, learning_rate = hyper_parameters[('artific
 split_ratio = 0.8
 num_realizations = 1
 
-model = MultiLayerPerceptron(num_hidden=5,
+model = MultiLayerPerceptron(num_hidden=2,
                              learning_rate=learning_rate,
                              epochs=epochs,
                              early_stopping=True,

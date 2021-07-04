@@ -1,7 +1,7 @@
 import random
 from assignment6.layer import Layer
 from assignment6.helpers import shape
-from assignment6.activation_functions import HyperbolicTangentActivationFunction, LinearActivationFunction
+from assignment6.activation_functions import LogisticActivationFunction, LinearActivationFunction
 
 
 class MultiLayerPerceptron:
@@ -10,7 +10,7 @@ class MultiLayerPerceptron:
         self.epochs = epochs
         self.early_stopping = early_stopping
         self.verbose = verbose
-        self.num_hidden = num_hidden + 1  # 1 for bias
+        self.num_hidden = num_hidden
         self.num_inputs = None
         self.num_classes = None
         self.one_hot_encodings = None
@@ -52,37 +52,41 @@ class MultiLayerPerceptron:
     # TODO: Make layer creation more generic and parameterized
     def initialize_layers(self):
         self.layers = list()
-        self.layers.append(Layer(activation_function=HyperbolicTangentActivationFunction(),
+        self.layers.append(Layer(activation_function=LogisticActivationFunction(),
                                  num_inputs=self.num_inputs,
                                  num_neurons=self.num_hidden,
                                  learning_rate=self.learning_rate))
-        self.layers.append(Layer(activation_function=LinearActivationFunction(),
+        self.layers.append(Layer(activation_function=LogisticActivationFunction(),
                                  num_inputs=self.num_hidden,
                                  num_neurons=self.num_classes,
                                  learning_rate=self.learning_rate))
 
     def predict(self, row):
-        y_t = [row + [-1]]  # Shape: (1, num_inputs)
-        assert shape(y_t) == (1, self.num_inputs)
+        y_t = [row + [1]]  # Shape: (1, num_inputs)
+        assert shape(y_t) == (1, self.num_inputs + 1)
 
         for i in range(len(self.layers)):
             step_result = i == len(self.layers) - 1
             y_t = self.layers[i].forward(y_t, training=False, step=step_result)
+            y_t = [y_t[0] + [1]]  # 1 for bias
 
-        for i in range(len(y_t[0])):
-            if y_t[0][i] != 0:
+        # Remove bias in the end
+        y_t = y_t[0][:-1]
+
+        for i in range(len(y_t)):
+            if y_t[i] != 0:
                 return i
 
         assert False, "Wrong result"
 
     def forward(self, row):
         # Get the features with bias
-        x_t = [row[:-self.num_classes] + [-1]]  # Shape: (1, num_inputs)
-        assert shape(x_t) == (1, self.num_inputs)
+        x_t = [row[:-self.num_classes] + [1]]  # Shape: (1, num_inputs)
+        assert shape(x_t) == (1, self.num_inputs + 1)  # 1 for bias
 
         for layer in self.layers:
             layer.forward(x_t, training=True)
-            x_t = layer.output
+            x_t = [layer.output[0] + [1]]  # 1 for bias
 
     def backward(self, row):
         d_t = [row[-self.num_classes:]]         # Shape: (1, num_classes)
@@ -100,8 +104,9 @@ class MultiLayerPerceptron:
             if i > 0:
                 x_t = self.layers[i - 1].output
             else:
-                x_t = [row[:-self.num_classes] + [-1]]
+                x_t = [row[:-self.num_classes]]
 
+            x_t = [x_t[0] + [1]]
             self.layers[i].backward(x_t)
             i -= 1
 
@@ -111,7 +116,7 @@ class MultiLayerPerceptron:
 
         self.generate_one_hot_encodings(training_set)
         one_hot_training_set = self.one_hot_encode(training_set)
-        self.num_inputs = len(one_hot_training_set[0]) - self.num_classes + 1  # 1 for bias
+        self.num_inputs = len(one_hot_training_set[0]) - self.num_classes
 
         self.initialize_layers()
         self.errors = list()
@@ -131,6 +136,10 @@ class MultiLayerPerceptron:
                             error_sum += error ** 2
                         except OverflowError:
                             error_sum = float('inf')
+
+                for layer in self.layers:
+                    layer.output = None
+                    layer.errors = None
 
             self.log("epoch {}, error: {:.2f}".format(epoch, error_sum))
             self.errors.append(error_sum)

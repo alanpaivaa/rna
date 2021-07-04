@@ -11,8 +11,8 @@ class Layer:
         self.learning_rate = learning_rate
         self.errors = None
         self.output = None
-        self.weights = [[random.uniform(0, 1) for _ in range(self.num_neurons)] for _ in range(self.num_inputs)]
-        assert shape(self.weights) == (self.num_inputs, self.num_neurons)
+        self.weights = [[random.uniform(0, 1) for _ in range(self.num_neurons)] for _ in range(self.num_inputs + 1)]
+        assert shape(self.weights) == (self.num_inputs + 1, self.num_neurons)  # 1 for bias
 
     def step_predict(self, u_t, y):
         y_t = [self.activation_function.step(prob) for prob in y]
@@ -52,7 +52,7 @@ class Layer:
 
     def update_errors(self, d_t):
         # Avoid numerical issues by using values close to 1
-        d_t = [[self.activation_function.transform_d(d) for d in row] for row in d_t]  # Shape: (1, num_neurons)
+        # d_t = [[self.activation_function.transform_d(d) for d in row] for row in d_t]  # Shape: (1, num_neurons)
         y_t = self.output  # Shape: (1, num_neurons)
         e_t = matrix_sub(d_t, y_t)  # Shape: (1, num_neurons)
         self.errors = e_t
