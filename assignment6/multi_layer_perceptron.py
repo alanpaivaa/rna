@@ -49,7 +49,6 @@ class MultiLayerPerceptron:
 
         return result
 
-    # TODO: Make layer creation more generic and parameterized
     def initialize_layers(self):
         self.layers = list()
         self.layers.append(Layer(activation_function=LogisticActivationFunction(),

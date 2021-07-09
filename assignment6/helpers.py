@@ -21,7 +21,7 @@ def load_dataset(filename):
             try:
                 row[i] = float(row[i])
             except ValueError:
-                pass
+                row[i] = 0
     return dataset
 
 

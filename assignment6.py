@@ -131,7 +131,16 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
 artificial_dataset = Dataset("assignment6/datasets/artificial.csv")
 
 # Iris
-iris_dataset = Dataset("assignment6/datasets/iris.csv", features=[0, 1])
+iris_dataset = Dataset("assignment6/datasets/iris.csv")
+
+# Vertebral column
+column_dataset = Dataset("assignment6/datasets/vertebral-column.csv")
+
+# Dermatology
+dermatology_dataset = Dataset("assignment6/datasets/dermatology.csv")
+
+# Breast Cancer
+breast_cancer_dataset = Dataset("assignment6/datasets/breast-cancer.csv")
 
 # Activation functions
 linear_activation_function = LinearActivationFunction()
@@ -143,9 +152,12 @@ hyper_parameters = {
     ('artificial', 'linear'): (artificial_dataset, linear_activation_function, 500, 0.3),
     # ('artificial', 'logistic'): (artificial_dataset, logistic_activation_function, 200, 0.05),
     # ('artificial', 'tanh'): (artificial_dataset, tanh_activation_function, 200, 0.01),
-    ('iris', 'linear'): (iris_dataset, linear_activation_function, 500, 0.03),
+    ('iris', 'linear'): (iris_dataset, linear_activation_function, 600, 0.1),
     # ('iris', 'logistic'): (iris_dataset, logistic_activation_function, 100, 0.1),
     # ('iris', 'tanh'): (iris_dataset, tanh_activation_function, 100, 0.1),
+    ('column', 'linear'): (column_dataset, linear_activation_function, 600, 0.05),
+    ('dermatology', 'linear'): (dermatology_dataset, linear_activation_function, 600, 0.1),
+    ('breast_cancer', 'linear'): (breast_cancer_dataset, linear_activation_function, 600, 0.1),
 }
 
 # Select best hyper parameters
@@ -159,12 +171,12 @@ hyper_parameters = {
 #     select_hyper_parameters(dataset.load(), activation_function)
 #     print("\n\n\n\n\n")
 
-dataset, activation_function, epochs, learning_rate = hyper_parameters[('artificial', 'linear')]
+dataset, activation_function, epochs, learning_rate = hyper_parameters[('breast_cancer', 'linear')]
 
 split_ratio = 0.8
 num_realizations = 1
 
-model = MultiLayerPerceptron(num_hidden=2,
+model = MultiLayerPerceptron(num_hidden=5,
                              learning_rate=learning_rate,
                              epochs=epochs,
                              early_stopping=True,
