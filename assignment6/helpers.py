@@ -16,7 +16,7 @@ def load_csv(filename):
 def load_dataset(filename):
     dataset = load_csv(filename)
     for row in dataset:
-        for i in range(len(row)):
+        for i in range(len(row) - 1):
             # Best effort: we just skip in case we can't convert a row to number
             try:
                 row[i] = float(row[i])

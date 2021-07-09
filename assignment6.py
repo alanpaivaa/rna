@@ -90,7 +90,7 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
         # Caching realization values
         realization = Realization(training_set,
                                   test_set,
-                                  None,#model.weights, FIXME
+                                  model.layers,
                                   Scores(d, y),
                                   model.errors)
         realizations.append(realization)
@@ -118,7 +118,7 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
     # Plot decision surface
     if len(dataset[0][:-1]) == 2 and plotting_available:
         # Set models with the "mean weights"
-        # model.weights = avg_realization.weights # FIXME
+        model.layers = avg_realization.layers
         plot_decision_surface(model,
                               normalized_dataset,
                               title="Superfície de Decisão",
@@ -171,16 +171,16 @@ hyper_parameters = {
 #     select_hyper_parameters(dataset.load(), activation_function)
 #     print("\n\n\n\n\n")
 
-dataset, activation_function, epochs, learning_rate = hyper_parameters[('breast_cancer', 'linear')]
+dataset, activation_function, epochs, learning_rate = hyper_parameters[('artificial', 'linear')]
 
 split_ratio = 0.8
-num_realizations = 1
+num_realizations = 3
 
 model = MultiLayerPerceptron(num_hidden=5,
                              learning_rate=learning_rate,
                              epochs=epochs,
                              early_stopping=True,
-                             verbose=True)
+                             verbose=False)
 evaluate(model, dataset.load(), ratio=split_ratio, num_realizations=num_realizations)
 
 print("Done!")
