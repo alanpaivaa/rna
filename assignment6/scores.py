@@ -1,3 +1,7 @@
+import math
+from assignment6.helpers import mean
+
+
 class Scores:
     def __init__(self, classes, predicted):
         self.classes = classes
@@ -38,3 +42,18 @@ class Scores:
             line = "\n{} {}".format(i, str_count)
             result += line
         print(result)
+
+
+class RegressionScores:
+    def __init__(self, classes, predictions):
+        assert len(classes) == len(predictions)
+        self.classes = classes
+        self.predictions = predictions
+        self.mse = None
+        self.rmse = None
+
+        self.compute_mse()
+
+    def compute_mse(self):
+        self.mse = mean([(y - y_hat) ** 2 for (y, y_hat) in zip(self.classes, self.predictions)])
+        self.rmse = math.sqrt(self.mse)

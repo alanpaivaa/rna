@@ -5,12 +5,13 @@ from assignment6.activation_functions import LogisticActivationFunction, LinearA
 
 
 class MultiLayerPerceptron:
-    def __init__(self, num_hidden=2, learning_rate=0.01, epochs=50, early_stopping=True, verbose=False):
+    def __init__(self, num_hidden=2, regression=False, learning_rate=0.01, epochs=50, early_stopping=True, verbose=False):
         self.learning_rate = learning_rate
         self.epochs = epochs
         self.early_stopping = early_stopping
         self.verbose = verbose
         self.num_hidden = num_hidden
+        self.regression = regression
         self.num_inputs = None
         self.num_classes = None
         self.one_hot_encodings = None
@@ -52,29 +53,46 @@ class MultiLayerPerceptron:
     def initialize_layers(self):
         self.layers = list()
         self.layers.append(Layer(activation_function=LogisticActivationFunction(),
+                                 regression=self.regression,
                                  num_inputs=self.num_inputs,
                                  num_neurons=self.num_hidden,
                                  learning_rate=self.learning_rate))
-        self.layers.append(Layer(activation_function=LogisticActivationFunction(),
-                                 num_inputs=self.num_hidden,
-                                 num_neurons=self.num_classes,
-                                 learning_rate=self.learning_rate))
+        if self.regression:
+            self.layers.append(Layer(activation_function=LogisticActivationFunction(),
+                                     regression=self.regression,
+                                     num_inputs=self.num_hidden,
+                                     num_neurons=self.num_hidden,
+                                     learning_rate=self.learning_rate))
+            self.layers.append(Layer(activation_function=LinearActivationFunction(),
+                                     regression=self.regression,
+                                     num_inputs=self.num_hidden,
+                                     num_neurons=1,
+                                     learning_rate=self.learning_rate))
+        else:
+            self.layers.append(Layer(activation_function=LogisticActivationFunction(),
+                                     regression=self.regression,
+                                     num_inputs=self.num_hidden,
+                                     num_neurons=self.num_classes,
+                                     learning_rate=self.learning_rate))
 
     def predict(self, row):
         y_t = [row + [1]]  # Shape: (1, num_inputs)
         assert shape(y_t) == (1, self.num_inputs + 1)
 
         for i in range(len(self.layers)):
-            step_result = i == len(self.layers) - 1
+            step_result = i == len(self.layers) - 1 and not self.regression
             y_t = self.layers[i].forward(y_t, training=False, step=step_result)
             y_t = [y_t[0] + [1]]  # 1 for bias
 
         # Remove bias in the end
         y_t = y_t[0][:-1]
 
-        for i in range(len(y_t)):
-            if y_t[i] != 0:
-                return i
+        if self.regression:
+            return y_t[0]
+        else:
+            for i in range(len(y_t)):
+                if y_t[i] != 0:
+                    return i
 
         assert False, "Wrong result"
 
@@ -113,9 +131,14 @@ class MultiLayerPerceptron:
         assert len(training_set) > 0
         assert len(training_set[0]) > 0
 
-        self.generate_one_hot_encodings(training_set)
-        one_hot_training_set = self.one_hot_encode(training_set)
-        self.num_inputs = len(one_hot_training_set[0]) - self.num_classes
+        if self.regression:
+            self.num_classes = 1
+            self.num_inputs = len(training_set[0]) - 1
+            one_hot_training_set = training_set
+        else:
+            self.generate_one_hot_encodings(training_set)
+            one_hot_training_set = self.one_hot_encode(training_set)
+            self.num_inputs = len(one_hot_training_set[0]) - self.num_classes
 
         self.initialize_layers()
         self.errors = list()

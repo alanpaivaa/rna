@@ -4,11 +4,12 @@ import random
 
 
 class Layer:
-    def __init__(self, activation_function, num_inputs, num_neurons, learning_rate):
+    def __init__(self, activation_function, regression, num_inputs, num_neurons, learning_rate):
         self.activation_function = activation_function
         self.num_inputs = num_inputs
         self.num_neurons = num_neurons
         self.learning_rate = learning_rate
+        self.regression = regression
         self.errors = None
         self.output = None
         self.weights = [[random.uniform(0, 1) for _ in range(self.num_neurons)] for _ in range(self.num_inputs + 1)]
@@ -42,8 +43,9 @@ class Layer:
         y_t = [self.activation_function.activate(u) for u in u_t]
 
         # Some activation functions don't have clear boundaries [0, 1], so we need the step function
-        if self.activation_function.step_train() or step:
-            y_t = self.step_predict(u_t, y_t)
+        if not self.regression:
+            if self.activation_function.step_train() or step:
+                y_t = self.step_predict(u_t, y_t)
 
         if training:
             self.output = [y_t]

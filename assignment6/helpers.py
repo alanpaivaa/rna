@@ -13,10 +13,13 @@ def load_csv(filename):
     return dataset
 
 
-def load_dataset(filename):
+def load_dataset(filename, last_column):
     dataset = load_csv(filename)
+    offset = 1
+    if last_column:
+        offset = 0
     for row in dataset:
-        for i in range(len(row) - 1):
+        for i in range(len(row) - offset):
             # Best effort: we just skip in case we can't convert a row to number
             try:
                 row[i] = float(row[i])
