@@ -5,8 +5,6 @@ from assignment6.multi_layer_perceptron import MultiLayerPerceptron
 from assignment6.realization import Realization
 from assignment6.scores import Scores, RegressionScores
 from assignment6.normalizer import Normalizer
-from assignment6.activation_functions import LinearActivationFunction, LogisticActivationFunction
-from assignment6.activation_functions import HyperbolicTangentActivationFunction
 
 # Import plotting modules, if they're available
 try:
@@ -17,54 +15,66 @@ except ModuleNotFoundError:
     plotting_available = False
 
 
-# def select_hyper_parameters(dataset, activation_function, k=5):
-#     random.shuffle(dataset)
-#     fold_size = int(len(dataset) / k)
-#
-#     epochs = [25, 50, 100, 200, 300, 400, 500]
-#     learning_rates = [0.1, 0.05, 0.01, 0.005, 0.001]
-#     results = list()
-#
-#     for epoch in epochs:
-#         for learning_rate in learning_rates:
-#             realizations = list()
-#             for i in range(k):
-#                 test_start = i * fold_size
-#                 test_end = (i + 1) * fold_size
-#
-#                 # Make training and test sets
-#                 training_set = list()
-#                 test_set = list()
-#                 for j in range(len(dataset)):
-#                     if j < test_start or j >= test_end:
-#                         training_set.append(dataset[j].copy())
-#                     else:
-#                         test_set.append(dataset[j].copy())
-#
-#                 model = GeneralPerceptronNetwork(activation_function, learning_rate=learning_rate, epochs=epoch)
-#                 model.train(training_set)
-#
-#                 d = list()
-#                 y = list()
-#
-#                 # Validate the model
-#                 for row in test_set:
-#                     d.append(row[-1])
-#                     y.append(model.predict(row[:-1]))
-#
-#                 realization = Realization(training_set, test_set, None, Scores(d, y), None)
-#                 realizations.append(realization)
-#
-#             accuracies = list(map(lambda r: r.scores.accuracy, realizations))
-#             mean_accuracy = mean(accuracies)
-#             print("Epochs: {}     Learning rate: {}     Accuracy: {:.2f}%".format(epoch, learning_rate, mean_accuracy * 100))
-#
-#             results.append((epoch, learning_rate, mean_accuracy))
-#
-#     results = sorted(results, key=lambda r: r[2], reverse=True)
-#     best_hyper_parameters = results[0]
-#     print("\n\n>>> Best hyper parameters:")
-#     print("Epochs: {}     Learning rate: {}     Accuracy: {:.2f}%".format(best_hyper_parameters[0], best_hyper_parameters[1], best_hyper_parameters[2] * 100))
+def select_hyper_parameters(dataset, k=5):
+    random.shuffle(dataset)
+    fold_size = int(len(dataset) / k)
+
+    hidden_layers = range(3, 10)
+    epochs = [300, 400, 500, 750, 1000, 1250]
+    learning_rate = 0.1
+    results = list()
+
+    for num_hidden in hidden_layers:
+        for epoch in epochs:
+            realizations = list()
+            for i in range(k):
+                test_start = i * fold_size
+                test_end = (i + 1) * fold_size
+
+                # Make training and test sets
+                training_set = list()
+                test_set = list()
+                for j in range(len(dataset)):
+                    if j < test_start or j >= test_end:
+                        training_set.append(dataset[j].copy())
+                    else:
+                        test_set.append(dataset[j].copy())
+
+                model = MultiLayerPerceptron(
+                    num_hidden=num_hidden,
+                    regression=False,
+                    learning_rate=learning_rate,
+                    epochs=epoch,
+                    early_stopping=True,
+                    verbose=False
+                )
+                model.train(training_set)
+
+                d = list()
+                y = list()
+
+                # Validate the model
+                for row in test_set:
+                    d.append(row[-1])
+                    y.append(model.predict(row[:-1]))
+
+                realization = Realization(training_set, test_set, None, Scores(d, y), None)
+                realizations.append(realization)
+
+            accuracies = list(map(lambda r: r.scores.accuracy, realizations))
+            mean_accuracy = mean(accuracies)
+            print(
+                "Hidden: {}     Epochs: {}     Learning rate: {}     Accuracy: {:.2f}%".format(
+                    num_hidden, epoch, learning_rate, mean_accuracy * 100
+                )
+            )
+
+            results.append((epoch, learning_rate, mean_accuracy))
+
+    results = sorted(results, key=lambda r: r[2], reverse=True)
+    best_hyper_parameters = results[0]
+    print("\n\n>>> Best hyper parameters:")
+    print("Epochs: {}     Learning rate: {}     Accuracy: {:.2f}%".format(best_hyper_parameters[0], best_hyper_parameters[1], best_hyper_parameters[2] * 100))
 
 
 def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
@@ -78,6 +88,7 @@ def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
 
     realizations = list()
     for i in range(0, num_realizations):
+        print("Realization {}...".format(i + 1))
         # Train the model
         training_set, test_set = train_test_split(normalized_dataset, ratio, shuffle=True)
         model.train(training_set)
@@ -140,7 +151,8 @@ def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
                                     avg_realization.training_set + avg_realization.test_set,
                                     x_label="X", y_label="Y",
                                     scatter_label='Base de dados',
-                                    model_label='Predição do modelo', title='Artificial I')
+                                    model_label='Predição do modelo',
+                                    title="{} épocas".format(epochs))
     else:
         # Accuracy Stats
         accuracies = list(map(lambda r: r.scores.accuracy, realizations))
@@ -189,36 +201,33 @@ dermatology_dataset = Dataset("assignment6/datasets/dermatology.csv")
 # Breast Cancer
 breast_cancer_dataset = Dataset("assignment6/datasets/breast-cancer.csv")
 
-# Sin
+# Artificial
 artificial_regression_dataset = Dataset("assignment6/datasets/artificial-regression.csv", regression=True)
 
 # Best hyper parameter found using grid search with k-fold cross validation
 hyper_parameters = {
-    'artificial': (artificial_dataset, False, 500, 0.3),
-    'iris': (iris_dataset, False, 600, 0.1),
-    'column': (column_dataset, False, 600, 0.05),
-    'dermatology': (dermatology_dataset, False, 600, 0.1),
-    'breast_cancer': (breast_cancer_dataset, False, 600, 0.1),
-    'artificial_regression': (artificial_regression_dataset, True, 1000, 0.1),
+    'artificial': (artificial_dataset, False, 500, 0.3, 7),
+    'iris': (iris_dataset, False, 600, 0.1, 7),
+    'column': (column_dataset, False, 600, 0.05, 7),
+    'dermatology': (dermatology_dataset, False, 600, 0.1, 7),
+    'breast_cancer': (breast_cancer_dataset, False, 600, 0.1, 7),
+    'artificial_regression': (artificial_regression_dataset, True, 500, 0.1, 7),
 }
 
 # Select best hyper parameters
-# select_hyper_parameters(iris_dataset.load(), tanh_activation_function)
-# ds = ['iris01', 'iris02', 'iris03', 'iris12', 'iris13', 'iris23']
-# fs = ['linear', 'logistic', 'tanh']
-# pairs = [(d, f) for d in ds for f in fs]
-# for d, f in pairs:
-#     dataset, activation_function, _, _ = hyper_parameters[(d, f)]
-#     print(">>>>>>>>>>>>>> {} - {} - {} - {}".format(d, f, dataset.filename, dataset.features))
-#     select_hyper_parameters(dataset.load(), activation_function)
+# datasets = ['artificial', 'iris', 'column', 'dermatology', 'breast_cancer']
+# for ds in datasets:
+#     print(">>>>>>>>>>>>>> {}".format(ds))
+#     dataset, _, _, _ = hyper_parameters['artificial']
+#     select_hyper_parameters(dataset.load())
 #     print("\n\n\n\n\n")
 
-dataset, regression, epochs, learning_rate = hyper_parameters['artificial']
+dataset, regression, epochs, learning_rate, hidden_layers = hyper_parameters['artificial']
 
 split_ratio = 0.8
-num_realizations = 1
+num_realizations = 20
 
-model = MultiLayerPerceptron(num_hidden=7,
+model = MultiLayerPerceptron(num_hidden=hidden_layers,
                              regression=regression,
                              learning_rate=learning_rate,
                              epochs=epochs,
