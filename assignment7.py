@@ -101,13 +101,13 @@ def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
                                       test_set,
                                       None,  # TODO: Add weights
                                       RegressionScores(y, d),
-                                      model.errors)
+                                      None)  # TODO: Add errors
         else:
             realization = Realization(training_set,
                                       test_set,
                                       None,  # TODO: Add weights
                                       Scores(d, y),
-                                      model.errors)
+                                      None)  # TODO: Add errors
         realizations.append(realization)
 
     if regression:
@@ -162,12 +162,12 @@ def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
         avg_realization.scores.print_confusion_matrix()
 
         # Plot error sum plot
-        if plotting_available:
-            plt.plot(range(1, len(avg_realization.errors) + 1), avg_realization.errors)
-            # plt.title("Artificial")
-            plt.xlabel("Épocas")
-            plt.ylabel("Soma dos erros")
-            plt.show()
+        # if plotting_available:
+        #     plt.plot(range(1, len(avg_realization.errors) + 1), avg_realization.errors)
+        #     # plt.title("Artificial")
+        #     plt.xlabel("Épocas")
+        #     plt.ylabel("Soma dos erros")
+        #     plt.show()
 
         # Plot decision surface
         if len(dataset[0][:-1]) == 2 and plotting_available:
@@ -220,7 +220,7 @@ hyper_parameters = {
 dataset, regression, epochs, learning_rate, hidden_layers = hyper_parameters['artificial']
 
 split_ratio = 0.8
-num_realizations = 20
+num_realizations = 1
 
 # TODO: Add params
 model = RBF()
