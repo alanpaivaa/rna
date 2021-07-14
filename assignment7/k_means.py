@@ -49,29 +49,4 @@ def k_means(dataset, k):
         # Update centroids
         centroids = new_centroids
 
-    # Create clusters from centroids
-    clusters = list()
-    for c in range(len(centroids)):
-        clusters.append([dataset[i] for i in range(len(closest_centroids)) if closest_centroids[i] == c] + [new_centroids[c]])
-
-    std_devs = list()
-    for cluster in clusters:
-        flat_points = list()
-        for point in cluster:
-            flat_points.append(point[0])
-            flat_points.append(point[1])
-
-        std_dev = 0
-        if len(flat_points) == 0:
-            if len(std_devs) == 0:
-                std_devs = 1
-            else:
-                std_dev = standard_deviation(std_devs)
-        else:
-            std_dev = standard_deviation(flat_points)
-
-        if std_dev == 0:
-            std_dev = 1
-        std_devs.append(std_dev)
-
-    return new_centroids, std_devs
+    return new_centroids

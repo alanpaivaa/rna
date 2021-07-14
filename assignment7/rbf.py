@@ -6,12 +6,13 @@ import numpy as np
 
 
 class RBF:
-    def __init__(self, num_hidden=None):
+    def __init__(self, num_hidden=None, regression=False):
         self.num_hidden = num_hidden
         self.h = None
         self.xi_t = None
         self.weights = None
         self.sigmas = None
+        self.regression = regression
 
     @staticmethod
     def rbf(row, xi, sigma):
@@ -20,7 +21,7 @@ class RBF:
 
     def generate_hidden(self, training_set):
         self.h = list()
-        self.xi_t, self.sigmas = k_means(training_set, self.num_hidden)
+        self.xi_t = k_means(training_set, self.num_hidden)
 
         d_max = np.max([euclidean_distance(c1, c2) for c1 in self.xi_t for c2 in self.xi_t])
         self.sigmas = [d_max / math.sqrt(2 * self.num_hidden)] * self.num_hidden
@@ -33,7 +34,10 @@ class RBF:
             self.h.append(h_row)
 
     def generate_olam_weights(self, training_set):
-        d = one_hot_encode(training_set)
+        if self.regression:
+            d = [[row[-1]] for row in training_set]
+        else:
+            d = one_hot_encode(training_set)
         ht = matrix_t(self.h)
         ht_h = matrix_product(ht, self.h)
         ht_h_inv = np.linalg.inv(np.array(ht_h))  # TODO: Don't use numpy
@@ -60,6 +64,9 @@ class RBF:
         h_row.append(-1)  # Bias
 
         u_t = matrix_product([h_row], self.weights)[0]
+
+        if self.regression:
+            return u_t[0]
 
         # Classification
         f = LogisticActivationFunction()

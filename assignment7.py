@@ -108,9 +108,8 @@ def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
                                       None,  # TODO: Add weights
                                       Scores(d, y),
                                       None)  # TODO: Add errors
+            print("Realization {}: {:.2f}%".format(i + 1, realization.scores.accuracy * 100))
         realizations.append(realization)
-
-        print("Realization {}: {:.2f}%".format(i + 1, realization.scores.accuracy * 100))
 
     if regression:
         # Sort realizations by mse
@@ -132,11 +131,11 @@ def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
         avg_realization = sorted(realizations, key=lambda r: abs(avg_mse - r.scores.mse))[0]
 
         # Plot error sum plot
-        if plotting_available:
-            plt.plot(range(1, len(avg_realization.errors) + 1), avg_realization.errors)
-            plt.xlabel("Épocas")
-            plt.ylabel("Soma dos erros")
-            plt.show()
+        # if plotting_available:
+        #     plt.plot(range(1, len(avg_realization.errors) + 1), avg_realization.errors)
+        #     plt.xlabel("Épocas")
+        #     plt.ylabel("Soma dos erros")
+        #     plt.show()
 
         # Plot decision surface
         if plotting_available:
@@ -149,7 +148,7 @@ def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
                                     x_label="X", y_label="Y",
                                     scatter_label='Base de dados',
                                     model_label='Predição do modelo',
-                                    title="{} épocas".format(epochs))
+                                    title="Regression surface")
     else:
         # Accuracy Stats
         accuracies = list(map(lambda r: r.scores.accuracy, realizations))
@@ -208,7 +207,7 @@ hyper_parameters = {
     'column': (column_dataset, False, 40),
     'dermatology': (dermatology_dataset, False, 49),
     'breast_cancer': (breast_cancer_dataset, False, 2),
-    # 'artificial_regression': (artificial_regression_dataset, True, 500, 0.1, 7),
+    'artificial_regression': (artificial_regression_dataset, True, 8),
 }
 
 # Select best hyper parameters
@@ -219,15 +218,15 @@ hyper_parameters = {
 # select_hyper_parameters(dermatology_dataset.load())
 #     print("\n\n\n\n\n")
 
-dataset, regression, hidden_layers = hyper_parameters['breast_cancer']
+dataset, regression, hidden_layers = hyper_parameters['artificial']
 
 split_ratio = 0.8
-num_realizations = 20
+num_realizations = 1
 
 print("Dataset: {}".format(dataset.filename))
 print("Hidden Layers: {}".format(hidden_layers))
 
-model = RBF(num_hidden=hidden_layers)
+model = RBF(num_hidden=hidden_layers, regression=regression)
 evaluate(model, dataset.load(), regression=regression, ratio=split_ratio, num_realizations=num_realizations)
 
 print("Done!")
