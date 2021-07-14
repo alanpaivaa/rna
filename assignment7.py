@@ -19,7 +19,7 @@ def select_hyper_parameters(dataset, k=5):
     random.shuffle(dataset)
     fold_size = int(len(dataset) / k)
 
-    hidden_layers = list(range(1, 20))
+    hidden_layers = list(range(1, 50))
     # sigmas = [.1, .2, .3, .4, .5, .6, .7, .8, .9, 1.0]
     # learning_rate = 0.1
     results = list()
@@ -68,7 +68,7 @@ def select_hyper_parameters(dataset, k=5):
     results = sorted(results, key=lambda r: r[1], reverse=True)
     best_hyper_parameters = results[0]
     print("\n\n>>> Best hyper parameters:")
-    print("Hidden: {}     Accuracy: {:.2f}%".format(best_hyper_parameters[0], best_hyper_parameters[1]))
+    print("Hidden: {}     Accuracy: {:.2f}%".format(best_hyper_parameters[0], best_hyper_parameters[1] * 100))
 
 
 def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
@@ -202,12 +202,12 @@ artificial_regression_dataset = Dataset("assignment7/datasets/artificial-regress
 
 # Best hyper parameter found using grid search with k-fold cross validation
 hyper_parameters = {
-    'artificial': (artificial_dataset, False, 500, 0.3, 7),
-    'iris': (iris_dataset, False, 600, 0.1, 7),
-    'column': (column_dataset, False, 600, 0.05, 7),
-    'dermatology': (dermatology_dataset, False, 600, 0.1, 7),
-    'breast_cancer': (breast_cancer_dataset, False, 600, 0.1, 7),
-    'artificial_regression': (artificial_regression_dataset, True, 500, 0.1, 7),
+    'artificial': (artificial_dataset, False, 10),
+    'iris': (iris_dataset, False, 20),
+    # 'column': (column_dataset, False, 600, 0.05, 7),
+    # 'dermatology': (dermatology_dataset, False, 600, 0.1, 7),
+    # 'breast_cancer': (breast_cancer_dataset, False, 600, 0.1, 7),
+    # 'artificial_regression': (artificial_regression_dataset, True, 500, 0.1, 7),
 }
 
 # Select best hyper parameters
@@ -215,16 +215,18 @@ hyper_parameters = {
 # for ds in datasets:
 #     print(">>>>>>>>>>>>>> {}".format(ds))
 #     dataset, _, _, _ = hyper_parameters['artificial']
-# select_hyper_parameters(artificial_dataset.load())
+# select_hyper_parameters(iris_dataset.load())
 #     print("\n\n\n\n\n")
 
-dataset, regression, epochs, learning_rate, hidden_layers = hyper_parameters['artificial']
+dataset, regression, hidden_layers = hyper_parameters['artificial']
 
 split_ratio = 0.8
 num_realizations = 20
 
-# TODO: Add params
-model = RBF(num_hidden=10)
+print("Dataset: {}".format(dataset.filename))
+print("Hidden Layers: {}".format(hidden_layers))
+
+model = RBF(num_hidden=hidden_layers)
 evaluate(model, dataset.load(), regression=regression, ratio=split_ratio, num_realizations=num_realizations)
 
 print("Done!")

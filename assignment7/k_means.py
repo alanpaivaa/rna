@@ -26,14 +26,14 @@ def k_means(dataset, k):
         new_centroids = list()
         for c in range(len(centroids)):
             close_points = [dataset[i][:-1] for i in range(len(closest_centroids)) if closest_centroids[i] == c]
-            cpx = [row[0] for row in close_points]
-            cpy = [row[1] for row in close_points]
-            if len(cpx) == 0 or len(cpy) == 0:
-                new_centroids.append([centroids[c][0], centroids[c][1]])
+            if len(close_points) == 0:
+                new_centroids.append(centroids[c])
             else:
-                cpx_mean = mean(cpx)
-                cpy_mean = mean(cpy)
-                new_centroids.append([cpx_mean, cpy_mean])
+                mean_point = list()
+                for j in range(len(close_points[0])):
+                    cpj = [row[j] for row in close_points]
+                    mean_point.append(mean(cpj))
+                new_centroids.append(mean_point)
 
         # Check if points changed
         centroids_changed = False
@@ -52,7 +52,7 @@ def k_means(dataset, k):
     # Create clusters from centroids
     clusters = list()
     for c in range(len(centroids)):
-        clusters.append([dataset[i] for i in range(len(closest_centroids)) if closest_centroids[i] == c])
+        clusters.append([dataset[i] for i in range(len(closest_centroids)) if closest_centroids[i] == c] + [new_centroids[c]])
 
     std_devs = list()
     for cluster in clusters:
@@ -60,6 +60,12 @@ def k_means(dataset, k):
         for point in cluster:
             flat_points.append(point[0])
             flat_points.append(point[1])
-        std_devs.append(standard_deviation(flat_points))
+        if len(flat_points) == 0:
+            if len(std_devs) == 0:
+                std_devs.append(1)
+            else:
+                std_devs.append(standard_deviation(std_devs))
+        else:
+            std_devs.append(standard_deviation(flat_points))
 
     return new_centroids, std_devs
