@@ -22,6 +22,9 @@ class RBF:
         self.h = list()
         self.xi_t, self.sigmas = k_means(training_set, self.num_hidden)
 
+        d_max = np.max([euclidean_distance(c1, c2) for c1 in self.xi_t for c2 in self.xi_t])
+        self.sigmas = [d_max / math.sqrt(2 * self.num_hidden)] * self.num_hidden
+
         for row in training_set:
             h_row = list()
             for r in range(len(self.xi_t)):
@@ -41,6 +44,11 @@ class RBF:
     def train(self, training_set):
         assert len(training_set) > 0
         assert len(training_set[0]) > 0
+
+        self.h = None
+        self.xi_t = None
+        self.weights = None
+        self.sigmas = None
 
         self.generate_hidden(training_set)
         self.generate_olam_weights(training_set)

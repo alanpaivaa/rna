@@ -19,7 +19,7 @@ def select_hyper_parameters(dataset, k=5):
     random.shuffle(dataset)
     fold_size = int(len(dataset) / k)
 
-    hidden_layers = list(range(1, 50))
+    hidden_layers = list(range(2, 50))
     # sigmas = [.1, .2, .3, .4, .5, .6, .7, .8, .9, 1.0]
     # learning_rate = 0.1
     results = list()
@@ -206,8 +206,8 @@ hyper_parameters = {
     'artificial': (artificial_dataset, False, 10),
     'iris': (iris_dataset, False, 20),
     'column': (column_dataset, False, 40),
-    # 'dermatology': (dermatology_dataset, False, 600, 0.1, 7),
-    'breast_cancer': (breast_cancer_dataset, False, 1),
+    'dermatology': (dermatology_dataset, False, 49),
+    'breast_cancer': (breast_cancer_dataset, False, 2),
     # 'artificial_regression': (artificial_regression_dataset, True, 500, 0.1, 7),
 }
 
@@ -216,10 +216,10 @@ hyper_parameters = {
 # for ds in datasets:
 #     print(">>>>>>>>>>>>>> {}".format(ds))
 #     dataset, _, _, _ = hyper_parameters['artificial']
-# select_hyper_parameters(column_dataset.load())
+# select_hyper_parameters(dermatology_dataset.load())
 #     print("\n\n\n\n\n")
 
-dataset, regression, hidden_layers = hyper_parameters['column']
+dataset, regression, hidden_layers = hyper_parameters['breast_cancer']
 
 split_ratio = 0.8
 num_realizations = 20
