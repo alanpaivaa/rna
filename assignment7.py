@@ -83,7 +83,6 @@ def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
 
     realizations = list()
     for i in range(0, num_realizations):
-        print("Realization {}...".format(i + 1))
         # Train the model
         training_set, test_set = train_test_split(normalized_dataset, ratio, shuffle=True)
         model.train(training_set)
@@ -110,6 +109,8 @@ def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
                                       Scores(d, y),
                                       None)  # TODO: Add errors
         realizations.append(realization)
+
+        print("Realization {}: {:.2f}%".format(i + 1, realization.scores.accuracy * 100))
 
     if regression:
         # Sort realizations by mse
@@ -204,7 +205,7 @@ artificial_regression_dataset = Dataset("assignment7/datasets/artificial-regress
 hyper_parameters = {
     'artificial': (artificial_dataset, False, 10),
     'iris': (iris_dataset, False, 20),
-    # 'column': (column_dataset, False, 600, 0.05, 7),
+    'column': (column_dataset, False, 40),
     # 'dermatology': (dermatology_dataset, False, 600, 0.1, 7),
     'breast_cancer': (breast_cancer_dataset, False, 1),
     # 'artificial_regression': (artificial_regression_dataset, True, 500, 0.1, 7),
@@ -215,10 +216,10 @@ hyper_parameters = {
 # for ds in datasets:
 #     print(">>>>>>>>>>>>>> {}".format(ds))
 #     dataset, _, _, _ = hyper_parameters['artificial']
-# select_hyper_parameters(breast_cancer_dataset.load())
+# select_hyper_parameters(column_dataset.load())
 #     print("\n\n\n\n\n")
 
-dataset, regression, hidden_layers = hyper_parameters['breast_cancer']
+dataset, regression, hidden_layers = hyper_parameters['column']
 
 split_ratio = 0.8
 num_realizations = 20
