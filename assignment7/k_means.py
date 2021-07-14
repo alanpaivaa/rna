@@ -60,12 +60,18 @@ def k_means(dataset, k):
         for point in cluster:
             flat_points.append(point[0])
             flat_points.append(point[1])
+
+        std_dev = 0
         if len(flat_points) == 0:
             if len(std_devs) == 0:
-                std_devs.append(1)
+                std_devs = 1
             else:
-                std_devs.append(standard_deviation(std_devs))
+                std_dev = standard_deviation(std_devs)
         else:
-            std_devs.append(standard_deviation(flat_points))
+            std_dev = standard_deviation(flat_points)
+
+        if std_dev == 0:
+            std_dev = 1
+        std_devs.append(std_dev)
 
     return new_centroids, std_devs

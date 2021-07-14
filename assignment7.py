@@ -206,7 +206,7 @@ hyper_parameters = {
     'iris': (iris_dataset, False, 20),
     # 'column': (column_dataset, False, 600, 0.05, 7),
     # 'dermatology': (dermatology_dataset, False, 600, 0.1, 7),
-    # 'breast_cancer': (breast_cancer_dataset, False, 600, 0.1, 7),
+    'breast_cancer': (breast_cancer_dataset, False, 1),
     # 'artificial_regression': (artificial_regression_dataset, True, 500, 0.1, 7),
 }
 
@@ -215,10 +215,10 @@ hyper_parameters = {
 # for ds in datasets:
 #     print(">>>>>>>>>>>>>> {}".format(ds))
 #     dataset, _, _, _ = hyper_parameters['artificial']
-# select_hyper_parameters(iris_dataset.load())
+# select_hyper_parameters(breast_cancer_dataset.load())
 #     print("\n\n\n\n\n")
 
-dataset, regression, hidden_layers = hyper_parameters['artificial']
+dataset, regression, hidden_layers = hyper_parameters['breast_cancer']
 
 split_ratio = 0.8
 num_realizations = 20
