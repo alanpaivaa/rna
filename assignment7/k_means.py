@@ -1,5 +1,5 @@
 import random
-from assignment7.helpers import euclidean_distance, mean, vectors_equal
+from assignment7.helpers import euclidean_distance, mean, vectors_equal, standard_deviation
 
 
 def k_means(dataset, k):
@@ -28,9 +28,12 @@ def k_means(dataset, k):
             close_points = [dataset[i][:-1] for i in range(len(closest_centroids)) if closest_centroids[i] == c]
             cpx = [row[0] for row in close_points]
             cpy = [row[1] for row in close_points]
-            cpx_mean = mean(cpx)
-            cpy_mean = mean(cpy)
-            new_centroids.append([cpx_mean, cpy_mean])
+            if len(cpx) == 0 or len(cpy) == 0:
+                new_centroids.append([centroids[c][0], centroids[c][1]])
+            else:
+                cpx_mean = mean(cpx)
+                cpy_mean = mean(cpy)
+                new_centroids.append([cpx_mean, cpy_mean])
 
         # Check if points changed
         centroids_changed = False
@@ -46,17 +49,17 @@ def k_means(dataset, k):
         # Update centroids
         centroids = new_centroids
 
-    # Find nearest points to centroids
-    final_centroids = list()
+    # Create clusters from centroids
+    clusters = list()
     for c in range(len(centroids)):
-        close_points = [(dataset[i][:-1], i) for i in range(len(closest_centroids)) if closest_centroids[i] == c]
-        index = -1
-        min_distance = float('inf')
-        for p in range(len(close_points)):
-            dist = euclidean_distance(close_points[p][0], centroids[c])
-            if dist < min_distance:
-                index = close_points[p][1]
-                min_distance = dist
-        final_centroids.append(dataset[index])
+        clusters.append([dataset[i] for i in range(len(closest_centroids)) if closest_centroids[i] == c])
 
-    return final_centroids
+    std_devs = list()
+    for cluster in clusters:
+        flat_points = list()
+        for point in cluster:
+            flat_points.append(point[0])
+            flat_points.append(point[1])
+        std_devs.append(standard_deviation(flat_points))
+
+    return new_centroids, std_devs

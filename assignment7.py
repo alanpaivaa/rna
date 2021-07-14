@@ -19,56 +19,56 @@ def select_hyper_parameters(dataset, k=5):
     random.shuffle(dataset)
     fold_size = int(len(dataset) / k)
 
-    hidden_layers = range(3, 10)
-    epochs = [300, 400, 500, 750, 1000, 1250]
-    learning_rate = 0.1
+    hidden_layers = list(range(1, 20))
+    # sigmas = [.1, .2, .3, .4, .5, .6, .7, .8, .9, 1.0]
+    # learning_rate = 0.1
     results = list()
 
     for num_hidden in hidden_layers:
-        for epoch in epochs:
-            realizations = list()
-            for i in range(k):
-                test_start = i * fold_size
-                test_end = (i + 1) * fold_size
+        # for sigma in sigmas:
+        realizations = list()
+        for i in range(k):
+            test_start = i * fold_size
+            test_end = (i + 1) * fold_size
 
-                # Make training and test sets
-                training_set = list()
-                test_set = list()
-                for j in range(len(dataset)):
-                    if j < test_start or j >= test_end:
-                        training_set.append(dataset[j].copy())
-                    else:
-                        test_set.append(dataset[j].copy())
+            # Make training and test sets
+            training_set = list()
+            test_set = list()
+            for j in range(len(dataset)):
+                if j < test_start or j >= test_end:
+                    training_set.append(dataset[j].copy())
+                else:
+                    test_set.append(dataset[j].copy())
 
-                # TODO: Add params
-                model = RBF()
-                model.train(training_set)
+            # TODO: Add params
+            model = RBF(num_hidden=num_hidden)
+            model.train(training_set)
 
-                d = list()
-                y = list()
+            d = list()
+            y = list()
 
-                # Validate the model
-                for row in test_set:
-                    d.append(row[-1])
-                    y.append(model.predict(row[:-1]))
+            # Validate the model
+            for row in test_set:
+                d.append(row[-1])
+                y.append(model.predict(row[:-1]))
 
-                realization = Realization(training_set, test_set, None, Scores(d, y), None)
-                realizations.append(realization)
+            realization = Realization(training_set, test_set, None, Scores(d, y), None)
+            realizations.append(realization)
 
-            accuracies = list(map(lambda r: r.scores.accuracy, realizations))
-            mean_accuracy = mean(accuracies)
-            print(
-                "Hidden: {}     Epochs: {}     Learning rate: {}     Accuracy: {:.2f}%".format(
-                    num_hidden, epoch, learning_rate, mean_accuracy * 100
-                )
+        accuracies = list(map(lambda r: r.scores.accuracy, realizations))
+        mean_accuracy = mean(accuracies)
+        print(
+            "Hidden: {}     Accuracy: {:.2f}%".format(
+                num_hidden, mean_accuracy * 100
             )
+        )
 
-            results.append((epoch, learning_rate, mean_accuracy))
+        results.append((num_hidden, mean_accuracy))
 
-    results = sorted(results, key=lambda r: r[2], reverse=True)
+    results = sorted(results, key=lambda r: r[1], reverse=True)
     best_hyper_parameters = results[0]
     print("\n\n>>> Best hyper parameters:")
-    print("Epochs: {}     Learning rate: {}     Accuracy: {:.2f}%".format(best_hyper_parameters[0], best_hyper_parameters[1], best_hyper_parameters[2] * 100))
+    print("Hidden: {}     Accuracy: {:.2f}%".format(best_hyper_parameters[0], best_hyper_parameters[1]))
 
 
 def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
@@ -79,6 +79,7 @@ def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
         normalized_dataset = [normalizer.normalize(row) for row in dataset]
     else:
         normalized_dataset = [normalizer.normalize(row[:-1]) + [row[-1]] for row in dataset]
+    # normalized_dataset = dataset
 
     realizations = list()
     for i in range(0, num_realizations):
@@ -214,16 +215,16 @@ hyper_parameters = {
 # for ds in datasets:
 #     print(">>>>>>>>>>>>>> {}".format(ds))
 #     dataset, _, _, _ = hyper_parameters['artificial']
-#     select_hyper_parameters(dataset.load())
+# select_hyper_parameters(artificial_dataset.load())
 #     print("\n\n\n\n\n")
 
 dataset, regression, epochs, learning_rate, hidden_layers = hyper_parameters['artificial']
 
 split_ratio = 0.8
-num_realizations = 1
+num_realizations = 20
 
 # TODO: Add params
-model = RBF()
+model = RBF(num_hidden=10)
 evaluate(model, dataset.load(), regression=regression, ratio=split_ratio, num_realizations=num_realizations)
 
 print("Done!")

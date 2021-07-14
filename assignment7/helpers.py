@@ -90,3 +90,64 @@ def matrix_product(a, b):
                 result[i][j] += a[i][k] * b[k][j]
 
     return result
+
+
+def step(u, threshold=0):
+    if u >= threshold:
+        return 1
+    else:
+        return 0
+
+
+def generate_one_hot_encodings(dataset):
+    max_class = -1
+    for row in dataset:
+        max_class = max(max_class, row[-1])
+    num_classes = max_class + 1
+
+    one_hot_encodings = dict()
+    for i in range(num_classes):
+        encoding = [0] * num_classes
+        encoding[i] = 1
+        one_hot_encodings[i] = encoding
+
+    return one_hot_encodings
+
+
+def one_hot_encode(dataset):
+    encodings = generate_one_hot_encodings(dataset)
+
+    result = list()
+    for row in dataset:
+        klass = row[-1]
+        encoding = encodings[klass]
+        one_hot = list()
+        for i in encoding:
+            one_hot.append(i)
+        result.append(one_hot)
+
+    return result
+
+
+def class_from_probs(u_t, y_t):
+    count = 0
+    for y in y_t:
+        count += y
+
+    # In "doubt" area
+    if count != 1:
+        i_max = 0
+        for i in range(len(u_t)):
+            if u_t[i] > u_t[i_max]:
+                i_max = i
+        for i in range(len(u_t)):
+            if i == i_max:
+                y_t[i] = 1
+            else:
+                y_t[i] = 0
+
+    for i in range(len(y_t)):
+        if y_t[i] == 1:
+            return i
+
+    assert False, "Should return one of the classes"
