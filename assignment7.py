@@ -38,8 +38,7 @@ def select_hyper_parameters(dataset, k=5):
                 else:
                     test_set.append(dataset[j].copy())
 
-            # TODO: Add params
-            model = RBF(num_hidden=num_hidden)
+            model = RBF(num_hidden=num_hidden, regression=False)
             model.train(training_set)
 
             d = list()
@@ -98,16 +97,18 @@ def evaluate(model, dataset, normalize=True, regression=False, ratio=0.8, num_re
         if regression:
             realization = Realization(training_set,
                                       test_set,
-                                      None,  # TODO: Add weights
-                                      RegressionScores(y, d),
-                                      None)  # TODO: Add errors
+                                      model.xi_t,
+                                      model.sigmas,
+                                      model.weights,
+                                      RegressionScores(y, d))
             print("Realization {}: {:.5f}".format(i + 1, realization.scores.rmse))
         else:
             realization = Realization(training_set,
                                       test_set,
-                                      None,  # TODO: Add weights
-                                      Scores(d, y),
-                                      None)  # TODO: Add errors
+                                      model.xi_t,
+                                      model.sigmas,
+                                      model.weights,
+                                      Scores(d, y))
             print("Realization {}: {:.2f}%".format(i + 1, realization.scores.accuracy * 100))
         realizations.append(realization)
 
@@ -140,8 +141,9 @@ def evaluate(model, dataset, normalize=True, regression=False, ratio=0.8, num_re
         # Plot decision surface
         if len(dataset[0][:-1]) == 1 and plotting_available:
             # Set models with the "mean weights"
-            # TODO: Set weights
-            # model.layers = avg_realization.layers
+            model.xi_t = avg_realization.xi_t
+            model.sigmas = avg_realization.sigmas
+            model.weights = avg_realization.weights
             plot_regression_surface(model,
                                     avg_realization.training_set + avg_realization.test_set,
                                     x_label="X",
@@ -173,7 +175,9 @@ def evaluate(model, dataset, normalize=True, regression=False, ratio=0.8, num_re
         # Plot decision surface
         if len(dataset[0][:-1]) == 2 and plotting_available:
             # Set models with the "mean weights"
-            model.layers = avg_realization.layers
+            model.xi_t = avg_realization.xi_t
+            model.sigmas = avg_realization.sigmas
+            model.weights = avg_realization.weights
             plot_decision_surface(model,
                                   normalized_dataset,
                                   title="Superfície de Decisão",
@@ -233,7 +237,7 @@ hyper_parameters = {
 dataset, regression, hidden_layers = hyper_parameters['artificial_regression']
 
 split_ratio = 0.8
-num_realizations = 1
+num_realizations = 20
 
 print("Dataset: {}".format(dataset.filename))
 print("Hidden Layers: {}".format(hidden_layers))

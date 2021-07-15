@@ -40,7 +40,7 @@ class RBF:
             d = one_hot_encode(training_set)
         ht = matrix_t(self.h)
         ht_h = matrix_product(ht, self.h)
-        ht_h_inv = np.linalg.inv(np.array(ht_h))  # TODO: Don't use numpy
+        ht_h_inv = np.linalg.inv(np.array(ht_h))
         ht_h_inv = ht_h_inv.tolist()
         ht_h_inv_ht = matrix_product(ht_h_inv, ht)
         self.weights = matrix_product(ht_h_inv_ht, d)
