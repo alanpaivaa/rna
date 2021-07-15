@@ -234,7 +234,7 @@ hyper_parameters = {
 # select_hyper_parameters(dermatology_dataset.load())
 #     print("\n\n\n\n\n")
 
-dataset, regression, hidden_layers = hyper_parameters['artificial_regression']
+dataset, regression, hidden_layers = hyper_parameters['artificial']
 
 split_ratio = 0.8
 num_realizations = 20
@@ -244,7 +244,7 @@ print("Hidden Layers: {}".format(hidden_layers))
 model = RBF(num_hidden=hidden_layers, regression=regression)
 evaluate(model,
          dataset.load(),
-         normalize=False,
+         normalize=not regression,
          regression=regression,
          ratio=split_ratio,
          num_realizations=num_realizations)
