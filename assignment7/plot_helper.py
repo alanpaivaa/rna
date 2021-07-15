@@ -36,7 +36,7 @@ def plot_decision_surface(model, dataset, title=None, xlabel=None, ylabel=None, 
     plt.show()
 
 
-def plot_regression_surface(model, normalizer, dataset, x_label='X', y_label='Y', z_label='Z', scatter_label=None, model_label=None, title=None):
+def plot_regression_surface(model, dataset, x_label='X', y_label='Y', z_label='Z', scatter_label=None, model_label=None, title=None):
     dataset = np.array(dataset)
     dataset = dataset[dataset[:, 0].argsort()]
 
@@ -77,7 +77,6 @@ def plot_regression_surface(model, normalizer, dataset, x_label='X', y_label='Y'
                 space_y.append(sy)
                 space_z.append(model.predict([sx, sy]))
         rows = [[space_x[i], space_y[i], space_z[i]] for i in range(len(space_x))]
-        rows = np.array([normalizer.denormalize(row) for row in rows])
         ax.plot3D(rows[:, 0], rows[:, 1], rows[:, 2], color=(0, .5, 0, .3), label=model_label)
     else:
         space_x = np.linspace(np.min(x), np.max(x), 1000)

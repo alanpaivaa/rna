@@ -1,6 +1,8 @@
 import random
 import math
 from csv import reader as csv_reader
+from csv import writer as csv_writer
+from csv import QUOTE_MINIMAL
 from functools import reduce
 
 
@@ -26,6 +28,13 @@ def load_dataset(filename, last_column):
             except ValueError:
                 row[i] = 0
     return dataset
+
+
+def write_dataset(dataset, filename):
+    with open(filename, mode='w') as file:
+        dataset_writer = csv_writer(file, delimiter=',', quotechar='"', quoting=QUOTE_MINIMAL)
+        for row in dataset:
+            dataset_writer.writerow(row)
 
 
 def euclidean_distance(x, y):

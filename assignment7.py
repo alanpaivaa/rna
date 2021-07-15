@@ -19,9 +19,7 @@ def select_hyper_parameters(dataset, k=5):
     random.shuffle(dataset)
     fold_size = int(len(dataset) / k)
 
-    hidden_layers = list(range(2, 50))
-    # sigmas = [.1, .2, .3, .4, .5, .6, .7, .8, .9, 1.0]
-    # learning_rate = 0.1
+    hidden_layers = list(range(2, 70))
     results = list()
 
     for num_hidden in hidden_layers:
@@ -71,15 +69,16 @@ def select_hyper_parameters(dataset, k=5):
     print("Hidden: {}     Accuracy: {:.2f}%".format(best_hyper_parameters[0], best_hyper_parameters[1] * 100))
 
 
-def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
-    normalizer = Normalizer()
-    normalizer.fit(dataset)
-
-    if regression:
-        normalized_dataset = [normalizer.normalize(row) for row in dataset]
+def evaluate(model, dataset, normalize=True, regression=False, ratio=0.8, num_realizations=20):
+    if normalize:
+        normalizer = Normalizer()
+        normalizer.fit(dataset)
+        if regression:
+            normalized_dataset = [normalizer.normalize(row) for row in dataset]
+        else:
+            normalized_dataset = [normalizer.normalize(row[:-1]) + [row[-1]] for row in dataset]
     else:
-        normalized_dataset = [normalizer.normalize(row[:-1]) + [row[-1]] for row in dataset]
-    # normalized_dataset = dataset
+        normalized_dataset = dataset
 
     realizations = list()
     for i in range(0, num_realizations):
@@ -102,6 +101,7 @@ def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
                                       None,  # TODO: Add weights
                                       RegressionScores(y, d),
                                       None)  # TODO: Add errors
+            print("Realization {}: {:.5f}".format(i + 1, realization.scores.rmse))
         else:
             realization = Realization(training_set,
                                       test_set,
@@ -138,14 +138,14 @@ def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
         #     plt.show()
 
         # Plot decision surface
-        if plotting_available:
+        if len(dataset[0][:-1]) == 1 and plotting_available:
             # Set models with the "mean weights"
             # TODO: Set weights
             # model.layers = avg_realization.layers
             plot_regression_surface(model,
-                                    normalizer,
                                     avg_realization.training_set + avg_realization.test_set,
-                                    x_label="X", y_label="Y",
+                                    x_label="X",
+                                    y_label="Y",
                                     scatter_label='Base de dados',
                                     model_label='Predição do modelo',
                                     title="Regression surface")
@@ -200,6 +200,15 @@ breast_cancer_dataset = Dataset("assignment7/datasets/breast-cancer.csv")
 # Artificial
 artificial_regression_dataset = Dataset("assignment7/datasets/artificial-regression.csv", regression=True)
 
+# Abalone
+abalone_dataset = Dataset("assignment7/datasets/abalone.csv", regression=True)
+
+# Car
+car_dataset = Dataset("assignment7/datasets/car.csv", regression=True)
+
+# Motor
+motor_dataset = Dataset("assignment7/datasets/motor.csv", regression=True)
+
 # Best hyper parameter found using grid search with k-fold cross validation
 hyper_parameters = {
     'artificial': (artificial_dataset, False, 10),
@@ -208,6 +217,9 @@ hyper_parameters = {
     'dermatology': (dermatology_dataset, False, 49),
     'breast_cancer': (breast_cancer_dataset, False, 2),
     'artificial_regression': (artificial_regression_dataset, True, 8),
+    'abalone': (abalone_dataset, True, 20),
+    'car': (car_dataset, True, 30),
+    'motor': (motor_dataset, True, 30),
 }
 
 # Select best hyper parameters
@@ -218,15 +230,19 @@ hyper_parameters = {
 # select_hyper_parameters(dermatology_dataset.load())
 #     print("\n\n\n\n\n")
 
-dataset, regression, hidden_layers = hyper_parameters['artificial']
+dataset, regression, hidden_layers = hyper_parameters['artificial_regression']
 
 split_ratio = 0.8
 num_realizations = 1
 
 print("Dataset: {}".format(dataset.filename))
 print("Hidden Layers: {}".format(hidden_layers))
-
 model = RBF(num_hidden=hidden_layers, regression=regression)
-evaluate(model, dataset.load(), regression=regression, ratio=split_ratio, num_realizations=num_realizations)
+evaluate(model,
+         dataset.load(),
+         normalize=False,
+         regression=regression,
+         ratio=split_ratio,
+         num_realizations=num_realizations)
 
 print("Done!")
