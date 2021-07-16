@@ -223,7 +223,7 @@ hyper_parameters = {
     'artificial_regression': (artificial_regression_dataset, True, 8),
     'abalone': (abalone_dataset, True, 20),
     'car': (car_dataset, True, 30),
-    'motor': (motor_dataset, True, 30),
+    'motor': (motor_dataset, True, 20),
 }
 
 # Select best hyper parameters

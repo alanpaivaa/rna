@@ -77,14 +77,17 @@ def select_hyper_parameters(dataset, k=5):
     print("Epochs: {}     Learning rate: {}     Accuracy: {:.2f}%".format(best_hyper_parameters[0], best_hyper_parameters[1], best_hyper_parameters[2] * 100))
 
 
-def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
-    normalizer = Normalizer()
-    normalizer.fit(dataset)
+def evaluate(model, dataset, regression=False, normalize=True, ratio=0.8, num_realizations=20):
+    if normalize:
+        normalizer = Normalizer()
+        normalizer.fit(dataset)
 
-    if regression:
-        normalized_dataset = [normalizer.normalize(row) for row in dataset]
+        if regression:
+            normalized_dataset = [normalizer.normalize(row) for row in dataset]
+        else:
+            normalized_dataset = [normalizer.normalize(row[:-1]) + [row[-1]] for row in dataset]
     else:
-        normalized_dataset = [normalizer.normalize(row[:-1]) + [row[-1]] for row in dataset]
+        normalized_dataset = dataset
 
     realizations = list()
     for i in range(0, num_realizations):
@@ -143,7 +146,7 @@ def evaluate(model, dataset, regression=False, ratio=0.8, num_realizations=20):
             plt.show()
 
         # Plot decision surface
-        if plotting_available:
+        if len(dataset[0][:-1]) == 2 and plotting_available:
             # Set models with the "mean weights"
             model.layers = avg_realization.layers
             plot_regression_surface(model,
@@ -204,6 +207,15 @@ breast_cancer_dataset = Dataset("assignment6/datasets/breast-cancer.csv")
 # Artificial
 artificial_regression_dataset = Dataset("assignment6/datasets/artificial-regression.csv", regression=True)
 
+# Abalone
+abalone_dataset = Dataset("assignment6/datasets/abalone.csv", regression=True)
+
+# Car
+car_dataset = Dataset("assignment6/datasets/car.csv", regression=True)
+
+# Motor
+motor_dataset = Dataset("assignment6/datasets/motor.csv", regression=True)
+
 # Best hyper parameter found using grid search with k-fold cross validation
 hyper_parameters = {
     'artificial': (artificial_dataset, False, 500, 0.3, 7),
@@ -212,6 +224,9 @@ hyper_parameters = {
     'dermatology': (dermatology_dataset, False, 600, 0.1, 7),
     'breast_cancer': (breast_cancer_dataset, False, 600, 0.1, 7),
     'artificial_regression': (artificial_regression_dataset, True, 500, 0.1, 7),
+    'abalone': (abalone_dataset, True, 500, 0.1, 7),
+    'car': (car_dataset, True, 350, 0.1, 7),
+    'motor': (motor_dataset, True, 10, 0.1, 4),
 }
 
 # Select best hyper parameters
@@ -233,6 +248,11 @@ model = MultiLayerPerceptron(num_hidden=hidden_layers,
                              epochs=epochs,
                              early_stopping=True,
                              verbose=False)
-evaluate(model, dataset.load(), regression=regression, ratio=split_ratio, num_realizations=num_realizations)
+evaluate(model,
+         dataset.load(),
+         regression=regression,
+         normalize=not regression,
+         ratio=split_ratio,
+         num_realizations=num_realizations)
 
 print("Done!")
