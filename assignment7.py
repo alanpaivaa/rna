@@ -131,13 +131,6 @@ def evaluate(model, dataset, normalize=True, regression=False, ratio=0.8, num_re
         # Realization whose mse is closest to the mean
         avg_realization = sorted(realizations, key=lambda r: abs(avg_mse - r.scores.mse))[0]
 
-        # Plot error sum plot
-        # if plotting_available:
-        #     plt.plot(range(1, len(avg_realization.errors) + 1), avg_realization.errors)
-        #     plt.xlabel("Épocas")
-        #     plt.ylabel("Soma dos erros")
-        #     plt.show()
-
         # Plot decision surface
         if len(dataset[0][:-1]) == 1 and plotting_available:
             # Set models with the "mean weights"
@@ -163,14 +156,6 @@ def evaluate(model, dataset, normalize=True, regression=False, ratio=0.8, num_re
 
         print("Confusion matrix")
         avg_realization.scores.print_confusion_matrix()
-
-        # Plot error sum plot
-        # if plotting_available:
-        #     plt.plot(range(1, len(avg_realization.errors) + 1), avg_realization.errors)
-        #     # plt.title("Artificial")
-        #     plt.xlabel("Épocas")
-        #     plt.ylabel("Soma dos erros")
-        #     plt.show()
 
         # Plot decision surface
         if len(dataset[0][:-1]) == 2 and plotting_available:
