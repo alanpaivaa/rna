@@ -3,6 +3,7 @@ from helpers.csv_helper import write_dataset, train_test_split
 from helpers.realization import Realization
 from helpers.scores import RegressionScores
 from assignment2.adaline import Adaline
+from assignment2.adaline_torch import AdalineTorch
 from helpers.normalizer import Normalizer
 from helpers.math import mean, standard_deviation
 from helpers.plot_helper import plot_regression_surface
@@ -56,7 +57,7 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
         # Caching realization values
         realization = Realization(training_set,
                                   test_set,
-                                  model.weights,
+                                  model.model.parameters(),
                                   RegressionScores(y, predictions),
                                   model.errors)
         realizations.append(realization)
@@ -89,7 +90,7 @@ def evaluate(model, dataset, ratio=0.8, num_realizations=20):
     # Plot decision surface
     if plotting_available:
         # Set models with the "mean weights"
-        model.weights = avg_realization.weights
+        model.model.parameters = avg_realization.weights
         plot_regression_surface(model,
                                 normalizer,
                                 avg_realization.training_set + avg_realization.test_set,
@@ -111,6 +112,6 @@ learning_rate = 0.01
 ratio = 0.8
 epochs = 100
 
-model = Adaline(epochs=epochs, learning_rate=learning_rate, early_stopping=True, verbose=False)
+model = AdalineTorch(epochs=epochs, learning_rate=learning_rate, early_stopping=True, verbose=False)
 evaluate(model, dataset.load(), ratio=ratio, num_realizations=20)
 print("Done!")
