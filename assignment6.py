@@ -2,6 +2,7 @@ import random
 from assignment6.helpers import train_test_split, mean, standard_deviation
 from assignment6.dataset import Dataset
 from assignment6.multi_layer_perceptron import MultiLayerPerceptron
+from assignment6.mlp import MLPTorch
 from assignment6.realization import Realization
 from assignment6.scores import Scores, RegressionScores
 from assignment6.normalizer import Normalizer
@@ -114,7 +115,7 @@ def evaluate(model, dataset, regression=False, normalize=True, ratio=0.8, num_re
         else:
             realization = Realization(training_set,
                                       test_set,
-                                      model.layers,
+                                      model.model.parameters(),
                                       Scores(d, y),
                                       model.errors)
         realizations.append(realization)
@@ -180,7 +181,7 @@ def evaluate(model, dataset, regression=False, normalize=True, ratio=0.8, num_re
         # Plot decision surface
         if len(dataset[0][:-1]) == 2 and plotting_available:
             # Set models with the "mean weights"
-            model.layers = avg_realization.layers
+            model.model.parameters = avg_realization.layers
             plot_decision_surface(model,
                                   normalized_dataset,
                                   title="Superfície de Decisão",
@@ -237,17 +238,17 @@ hyper_parameters = {
 #     select_hyper_parameters(dataset.load())
 #     print("\n\n\n\n\n")
 
-dataset, regression, epochs, learning_rate, hidden_layers = hyper_parameters['artificial']
+dataset, regression, epochs, learning_rate, hidden_layers = hyper_parameters['breast_cancer']
 
 split_ratio = 0.8
 num_realizations = 20
 
-model = MultiLayerPerceptron(num_hidden=hidden_layers,
-                             regression=regression,
-                             learning_rate=learning_rate,
-                             epochs=epochs,
-                             early_stopping=True,
-                             verbose=False)
+model = MLPTorch(num_hidden=hidden_layers,
+                 batch_size=5,
+                 regression=regression,
+                 learning_rate=learning_rate,
+                 epochs=epochs,
+                 verbose=False)
 evaluate(model,
          dataset.load(),
          regression=regression,
