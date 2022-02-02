@@ -109,7 +109,7 @@ def evaluate(model, dataset, regression=False, normalize=True, ratio=0.8, num_re
         if regression:
             realization = Realization(training_set,
                                       test_set,
-                                      model.layers,
+                                      model.model.parameters(),
                                       RegressionScores(y, d),
                                       model.errors)
         else:
@@ -146,17 +146,17 @@ def evaluate(model, dataset, regression=False, normalize=True, ratio=0.8, num_re
             plt.ylabel("Soma dos erros")
             plt.show()
 
-        # Plot decision surface
-        if len(dataset[0][:-1]) == 2 and plotting_available:
-            # Set models with the "mean weights"
-            model.layers = avg_realization.layers
-            plot_regression_surface(model,
-                                    normalizer,
-                                    avg_realization.training_set + avg_realization.test_set,
-                                    x_label="X", y_label="Y",
-                                    scatter_label='Base de dados',
-                                    model_label='Predição do modelo',
-                                    title="{} épocas".format(epochs))
+        # # Plot decision surface
+        # if len(dataset[0][:-1]) == 2 and plotting_available:
+        #     # Set models with the "mean weights"
+        #     model.layers = avg_realization.layers
+        #     plot_regression_surface(model,
+        #                             normalizer,
+        #                             avg_realization.training_set + avg_realization.test_set,
+        #                             x_label="X", y_label="Y",
+        #                             scatter_label='Base de dados',
+        #                             model_label='Predição do modelo',
+        #                             title="{} épocas".format(epochs))
     else:
         # Accuracy Stats
         accuracies = list(map(lambda r: r.scores.accuracy, realizations))
@@ -224,7 +224,7 @@ hyper_parameters = {
     'column': (column_dataset, False, 600, 0.05, 7),
     'dermatology': (dermatology_dataset, False, 600, 0.1, 7),
     'breast_cancer': (breast_cancer_dataset, False, 600, 0.1, 7),
-    'artificial_regression': (artificial_regression_dataset, True, 500, 0.1, 7),
+    'artificial_regression': (artificial_regression_dataset, True, 500, 0.1, 20),
     'abalone': (abalone_dataset, True, 500, 0.1, 7),
     'car': (car_dataset, True, 350, 0.1, 7),
     'motor': (motor_dataset, True, 10, 0.1, 4),
@@ -238,10 +238,10 @@ hyper_parameters = {
 #     select_hyper_parameters(dataset.load())
 #     print("\n\n\n\n\n")
 
-dataset, regression, epochs, learning_rate, hidden_layers = hyper_parameters['breast_cancer']
+dataset, regression, epochs, learning_rate, hidden_layers = hyper_parameters['artificial_regression']
 
 split_ratio = 0.8
-num_realizations = 20
+num_realizations = 1
 
 model = MLPTorch(num_hidden=hidden_layers,
                  batch_size=5,
@@ -249,6 +249,12 @@ model = MLPTorch(num_hidden=hidden_layers,
                  learning_rate=learning_rate,
                  epochs=epochs,
                  verbose=False)
+
+# model = MultiLayerPerceptron(num_hidden=hidden_layers,
+#                              regression=regression,
+#                              learning_rate=learning_rate,
+#                              epochs=epochs,
+#                              verbose=False)
 evaluate(model,
          dataset.load(),
          regression=regression,

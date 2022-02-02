@@ -24,6 +24,8 @@ class MLP(nn.Module):
         self.layers = nn.Sequential(
             nn.Linear(num_input, num_hidden),
             nn.Sigmoid(),
+            nn.Linear(num_hidden, num_hidden),
+            nn.Sigmoid(),
             nn.Linear(num_hidden, num_output)
         )
 
@@ -43,15 +45,21 @@ class MLPTorch:
         self.errors = None
 
     def train(self, training_set):
-        num_output = int(torch.max(torch.tensor(training_set)[:, -1]).item() + 1)
-        # one_hot = F.one_hot(torch.arange(num_output))
+        if self.regression:
+            num_output = 1
+        else:
+            num_output = int(torch.max(torch.tensor(training_set)[:, -1]).item() + 1)
 
         dataset = TorchDataset(dataset=training_set)
         dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
         self.model = MLP(num_input=len(training_set[0]) - 1, num_hidden=self.num_hidden, num_output=num_output)
-        optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
-        loss_fn = nn.CrossEntropyLoss()
+        optimizer = optim.SGD(self.model.parameters(), lr=self.learning_rate)
+
+        if self.regression:
+            loss_fn = nn.MSELoss()
+        else:
+            loss_fn = nn.CrossEntropyLoss()
 
         self.model.train()
         self.errors = list()
@@ -61,7 +69,10 @@ class MLPTorch:
             for x, y in dataloader:
                 pred = self.model(x)
 
-                loss = loss_fn(pred, y.long())
+                if self.regression:
+                    loss = loss_fn(pred, y.float().view(-1, 1))
+                else:
+                    loss = loss_fn(pred, y.long())
                 loss_sum += loss.item()
 
                 optimizer.zero_grad()
@@ -72,6 +83,9 @@ class MLPTorch:
             self.errors.append(loss_sum)
 
     def predict(self, x):
+        self.model.eval()
         pred = self.model(torch.tensor(x).float())
+        if self.regression:
+            return pred.item()
         prob = F.softmax(pred, dim=0)
         return torch.argmax(prob).item()
